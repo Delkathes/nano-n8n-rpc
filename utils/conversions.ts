@@ -3,14 +3,20 @@ import NanoConverter from './nano-converter';
 /**
  * Convert NANO to raw units (1 NANO = 10^30 raw)
  */
-export function nanoToRaw(nano: string | number): string {
+export function nanoToRaw(nano: string | number | undefined | null): string {
+  if (nano === undefined || nano === null || nano === '') {
+    return '0';
+  }
   return NanoConverter.convert(nano, 'NANO', 'RAW');
 }
 
 /**
  * Convert raw units to NANO
  */
-export function rawToNano(raw: string, decimals: number = 30): string {
+export function rawToNano(raw: string | undefined | null, decimals: number = 30): string {
+  if (raw === undefined || raw === null || raw === '') {
+    return '0';
+  }
   const fullPrecision = NanoConverter.convert(raw, 'RAW', 'NANO');
   // Trim to desired decimal places
   const dotIndex = fullPrecision.indexOf('.');
@@ -31,7 +37,10 @@ export function isValidNanoAddress(address: string): boolean {
 /**
  * Format amount for display
  */
-export function formatNanoAmount(raw: string): string {
+export function formatNanoAmount(raw: string | undefined | null): string {
+  if (raw === undefined || raw === null || raw === '') {
+    return '0 NANO';
+  }
   const nanoStr = NanoConverter.convert(raw, 'RAW', 'NANO', { trim: true });
   const nano = parseFloat(nanoStr);
 

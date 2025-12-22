@@ -23,6 +23,9 @@ export default class NanoConverter {
 		outputUnit: NanoUnit,
 		options: ConvertOptions = {}
 	): string => {
+		if (input === undefined || input === null || input === '') {
+			return '0';
+		}
 		const { trim = false } = options;
 		let value = parseDecimal(input.toString());
 
