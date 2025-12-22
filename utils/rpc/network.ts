@@ -1,12 +1,26 @@
 import type { IExecuteFunctions } from 'n8n-workflow';
-import { INanoRPCConfig, nanoRPCCall } from './core';
-import type { PeersRPCResponse, RepresentativesOnlineRPCResponse, TelemetryRPCResponse } from '../../nodes/Nano/types';
+import { nanoRPCCall } from './core';
+import type {
+  INanoRPCConfig,
+  PeersRPCResponse,
+  RepresentativesOnlineRPCResponse,
+  TelemetryRPCResponse,
+  PeersOptions,
+  TelemetryOptions,
+  RepresentativesOnlineOptions,
+  AvailableSupplyRPCResponse,
+  NodeIdRPCResponse,
+  VersionRPCResponse,
+  UptimeRPCResponse,
+  RepresentativesRPCResponse,
+  RepublishRPCResponse,
+} from '../../types/rpc';
 
 /**
  * Get the total available supply of Nano
  */
 export async function getAvailableSupply(context: IExecuteFunctions, config: INanoRPCConfig): Promise<string> {
-  const response = await nanoRPCCall<{ available: string }>(context, config, 'available_supply');
+  const response = await nanoRPCCall<AvailableSupplyRPCResponse>(context, config, 'available_supply');
   return response.available;
 }
 
@@ -21,19 +35,14 @@ export async function keepalive(context: IExecuteFunctions, config: INanoRPCConf
 /**
  * Get node ID
  */
-export async function getNodeId(context: IExecuteFunctions, config: INanoRPCConfig): Promise<{ private: string; public: string; as_account: string }> {
-  const response = await nanoRPCCall<{ private: string; public: string; as_account: string }>(context, config, 'node_id');
+export async function getNodeId(context: IExecuteFunctions, config: INanoRPCConfig): Promise<NodeIdRPCResponse> {
+  const response = await nanoRPCCall<NodeIdRPCResponse>(context, config, 'node_id');
   return {
     private: response.private,
     public: response.public,
     as_account: response.as_account,
+    node_id: response.node_id,
   };
-}
-
-/** Options for peers RPC call */
-export interface PeersOptions {
-  /** When true, returns detailed peer info including node_id and connection type (v18.0+) */
-  peer_details?: boolean;
 }
 
 /**
@@ -74,7 +83,7 @@ export async function getRepresentatives(
   } else if (count !== undefined && count > 0) {
     params.count = count;
   }
-  const response = await nanoRPCCall<{ representatives: Record<string, string> }>(context, config, 'representatives', params);
+  const response = await nanoRPCCall<RepresentativesRPCResponse>(context, config, 'representatives', params);
   return response.representatives;
 }
 
@@ -84,15 +93,14 @@ export async function getRepresentatives(
 export async function getRepresentativesOnline(
   context: IExecuteFunctions,
   config: INanoRPCConfig,
-  weight?: boolean,
-  accounts?: string[]
+  options?: RepresentativesOnlineOptions
 ): Promise<RepresentativesOnlineRPCResponse> {
   const params: Record<string, boolean | string[]> = {};
-  if (weight) {
+  if (options?.weight) {
     params.weight = true;
   }
-  if (accounts && accounts.length > 0) {
-    params.accounts = accounts;
+  if (options?.accounts && options.accounts.length > 0) {
+    params.accounts = options.accounts;
   }
   return await nanoRPCCall<RepresentativesOnlineRPCResponse>(context, config, 'representatives_online', params);
 }
@@ -107,19 +115,9 @@ export async function republish(
   count?: number,
   sources?: number,
   destinations?: number
-): Promise<{ blocks: string[] }> {
-  const response = await nanoRPCCall<{ blocks: string[] }>(context, config, 'republish', { hash, count, sources, destinations });
+): Promise<RepublishRPCResponse> {
+  const response = await nanoRPCCall<RepublishRPCResponse>(context, config, 'republish', { hash, count, sources, destinations });
   return { blocks: response.blocks };
-}
-
-/** Options for telemetry RPC call */
-export interface TelemetryOptions {
-  /** When true, returns metrics from all nodes with address and port for each peer */
-  raw?: boolean;
-  /** Get telemetry from a specific peer (requires port). Accepts both IPv4 and IPv6 addresses. */
-  address?: string;
-  /** Port of the specific peer to get telemetry from (requires address) */
-  port?: number;
 }
 
 /**
@@ -149,26 +147,8 @@ export async function getTelemetry(
 /**
  * Get node version information
  */
-export async function getVersion(context: IExecuteFunctions, config: INanoRPCConfig): Promise<{
-  rpc_version: string;
-  store_version: string;
-  protocol_version: string;
-  node_vendor: string;
-  store_vendor?: string;
-  network: string;
-  network_identifier: string;
-  build_info: string;
-}> {
-  const response = await nanoRPCCall<{
-    rpc_version: string;
-    store_version: string;
-    protocol_version: string;
-    node_vendor: string;
-    store_vendor?: string;
-    network: string;
-    network_identifier: string;
-    build_info: string;
-  }>(context, config, 'version');
+export async function getVersion(context: IExecuteFunctions, config: INanoRPCConfig): Promise<VersionRPCResponse> {
+  const response = await nanoRPCCall<VersionRPCResponse>(context, config, 'version');
   return {
     rpc_version: response.rpc_version,
     store_version: response.store_version,
@@ -185,6 +165,6 @@ export async function getVersion(context: IExecuteFunctions, config: INanoRPCCon
  * Get node uptime in seconds
  */
 export async function getUptime(context: IExecuteFunctions, config: INanoRPCConfig): Promise<number> {
-  const response = await nanoRPCCall<{ seconds: string }>(context, config, 'uptime');
+  const response = await nanoRPCCall<UptimeRPCResponse>(context, config, 'uptime');
   return parseInt(response.seconds);
 }

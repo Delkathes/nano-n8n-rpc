@@ -1,19 +1,25 @@
 import type { IExecuteFunctions } from 'n8n-workflow';
-import { INanoRPCConfig, nanoRPCCall } from './core';
-import type { CreateBlockParams, BlockContents, BlockInfoRPCResponse } from '../../nodes/Nano/types';
-
-/** Response from block_create */
-export interface BlockCreateResponse {
-  hash: string;
-  difficulty: string;
-  block: BlockContents;
-}
+import { nanoRPCCall } from './core';
+import type {
+  INanoRPCConfig,
+  CreateBlockParams,
+  BlockContents,
+  BlockAccountRPCResponse,
+  BlockConfirmRPCResponse,
+  BlockCountRPCResponse,
+  BlockHashRPCResponse,
+  BlocksRPCResponse,
+  BlockInfoRPCResponse,
+  BlockCreateResponse,
+  BlocksInfoOptions,
+  BlocksInfoResponse,
+} from '../../types/rpc';
 
 /**
  * Get the account that owns a block
  */
 export async function getBlockAccount(context: IExecuteFunctions, config: INanoRPCConfig, hash: string): Promise<string> {
-  const response = await nanoRPCCall<{ account: string }>(context, config, 'block_account', { hash });
+  const response = await nanoRPCCall<BlockAccountRPCResponse>(context, config, 'block_account', { hash });
   return response.account;
 }
 
@@ -21,7 +27,7 @@ export async function getBlockAccount(context: IExecuteFunctions, config: INanoR
  * Request confirmation for a block
  */
 export async function confirmBlock(context: IExecuteFunctions, config: INanoRPCConfig, hash: string): Promise<boolean> {
-  const response = await nanoRPCCall<{ started: string }>(context, config, 'block_confirm', { hash });
+  const response = await nanoRPCCall<BlockConfirmRPCResponse>(context, config, 'block_confirm', { hash });
   return response.started === '1';
 }
 
@@ -40,7 +46,7 @@ export async function createBlock(
  * Calculate hash for a block
  */
 export async function getBlockHash(context: IExecuteFunctions, config: INanoRPCConfig, block: BlockContents): Promise<string> {
-  const response = await nanoRPCCall<{ hash: string }>(context, config, 'block_hash', { block });
+  const response = await nanoRPCCall<BlockHashRPCResponse>(context, config, 'block_hash', { block });
   return response.hash;
 }
 
@@ -67,31 +73,9 @@ export async function getBlockInfo(
 /**
  * Get multiple blocks by their hashes
  */
-export async function getBlocks(context: IExecuteFunctions, config: INanoRPCConfig, hashes: string[]): Promise<Record<string, BlockContents>> {
-  const response = await nanoRPCCall<{ blocks: Record<string, BlockContents> }>(context, config, 'blocks', { hashes, json_block: true });
+export async function getBlocks(context: IExecuteFunctions, config: INanoRPCConfig, hashes: string[]): Promise<Record<string, BlockContents | string>> {
+  const response = await nanoRPCCall<BlocksRPCResponse>(context, config, 'blocks', { hashes, json_block: true });
   return response.blocks;
-}
-
-/** Options for blocks_info */
-export interface BlocksInfoOptions {
-  /** Return contents as JSON object instead of string (v19.0+, default true) */
-  jsonBlock?: boolean;
-  /** Include blocks_not_found array in response (v19.0+) */
-  includeNotFound?: boolean;
-  /** Check if block is pending/receivable (v9.0+) */
-  pending?: boolean;
-  /** Return source account for receive & open blocks (v9.0+) */
-  source?: boolean;
-  /** Include receive_hash for send blocks (v24.0+) */
-  receiveHash?: boolean;
-  /** Include linked_account field (v28.0+) */
-  includeLinkedAccount?: boolean;
-}
-
-/** Response from blocks_info */
-export interface BlocksInfoResponse {
-  blocks: Record<string, BlockInfoRPCResponse>;
-  blocks_not_found?: string[];
 }
 
 /**
@@ -133,11 +117,6 @@ export async function getBlocksInfo(
 export async function getBlockCount(
   context: IExecuteFunctions,
   config: INanoRPCConfig
-): Promise<{ count: string; unchecked: string; cemented: string }> {
-  const response = await nanoRPCCall<{ count: string; unchecked: string; cemented: string }>(context, config, 'block_count');
-  return {
-    count: response.count,
-    unchecked: response.unchecked,
-    cemented: response.cemented,
-  };
+): Promise<BlockCountRPCResponse> {
+  return await nanoRPCCall<BlockCountRPCResponse>(context, config, 'block_count');
 }

@@ -1,6 +1,24 @@
 import type { IExecuteFunctions } from 'n8n-workflow';
-import { INanoRPCConfig, nanoRPCCall } from './core';
-import type { AccountInfoRPCResponse, AccountHistoryRPCResponse, ReceivableRPCResponse } from '../../nodes/Nano/types';
+import { nanoRPCCall } from './core';
+import type {
+  INanoRPCConfig,
+  AccountBalanceRPCResponse,
+  AccountBlockCountRPCResponse,
+  AccountGetRPCResponse,
+  AccountKeyRPCResponse,
+  AccountRepresentativeRPCResponse,
+  AccountWeightRPCResponse,
+  AccountsFrontiersRPCResponse,
+  AccountsRepresentativesRPCResponse,
+  ValidateAccountRPCResponse,
+  AccountInfoRPCResponse,
+  AccountHistoryRPCResponse,
+  ReceivableRPCResponse,
+  AccountInfoOptions,
+  AccountHistoryOptions,
+  AccountsBalancesOptions,
+  AccountsReceivableOptions,
+} from '../../types/rpc';
 
 /**
  * Get account balance
@@ -11,7 +29,7 @@ export async function getBalance(
   config: INanoRPCConfig,
   account: string,
   includeOnlyConfirmed?: boolean
-): Promise<{ balance: string; pending: string; receivable: string }> {
+): Promise<AccountBalanceRPCResponse> {
   const params: Record<string, unknown> = { account };
 
   // Only send the param if explicitly set to false (since true is the default)
@@ -19,7 +37,7 @@ export async function getBalance(
     params.include_only_confirmed = false;
   }
 
-  return await nanoRPCCall<{ balance: string; pending: string; receivable: string }>(
+  return await nanoRPCCall<AccountBalanceRPCResponse>(
     context, config, 'account_balance', params
   );
 }
@@ -28,7 +46,7 @@ export async function getBalance(
  * Get number of blocks for a specific account
  */
 export async function getAccountBlockCount(context: IExecuteFunctions, config: INanoRPCConfig, account: string): Promise<number> {
-  const response = await nanoRPCCall<{ block_count: string }>(context, config, 'account_block_count', { account });
+  const response = await nanoRPCCall<AccountBlockCountRPCResponse>(context, config, 'account_block_count', { account });
   return parseInt(response.block_count);
 }
 
@@ -36,22 +54,8 @@ export async function getAccountBlockCount(context: IExecuteFunctions, config: I
  * Get account number for the public key
  */
 export async function getAccountFromPublicKey(context: IExecuteFunctions, config: INanoRPCConfig, key: string): Promise<string> {
-  const response = await nanoRPCCall<{ account: string }>(context, config, 'account_get', { key });
+  const response = await nanoRPCCall<AccountGetRPCResponse>(context, config, 'account_get', { key });
   return response.account;
-}
-
-/** Options for account_info */
-export interface AccountInfoOptions {
-  /** Include representative field (v9.0+, default true) */
-  representative?: boolean;
-  /** Include voting weight field (v9.0+, default true) */
-  weight?: boolean;
-  /** Include pending/receivable balance (v9.0+, default true) */
-  pending?: boolean;
-  /** Include receivable balance - alias for pending (default true) */
-  receivable?: boolean;
-  /** Include confirmed_* fields (v22.0+, default false) */
-  includeConfirmed?: boolean;
 }
 
 /**
@@ -84,7 +88,7 @@ export async function getAccountInfo(
  * Get the public key for an account
  */
 export async function getAccountKey(context: IExecuteFunctions, config: INanoRPCConfig, account: string): Promise<string> {
-  const response = await nanoRPCCall<{ key: string }>(context, config, 'account_key', { account });
+  const response = await nanoRPCCall<AccountKeyRPCResponse>(context, config, 'account_key', { account });
   return response.key;
 }
 
@@ -92,7 +96,7 @@ export async function getAccountKey(context: IExecuteFunctions, config: INanoRPC
  * Get the representative for an account
  */
 export async function getAccountRepresentative(context: IExecuteFunctions, config: INanoRPCConfig, account: string): Promise<string> {
-  const response = await nanoRPCCall<{ representative: string }>(context, config, 'account_representative', { account });
+  const response = await nanoRPCCall<AccountRepresentativeRPCResponse>(context, config, 'account_representative', { account });
   return response.representative;
 }
 
@@ -100,24 +104,8 @@ export async function getAccountRepresentative(context: IExecuteFunctions, confi
  * Get voting weight for an account
  */
 export async function getAccountWeight(context: IExecuteFunctions, config: INanoRPCConfig, account: string): Promise<string> {
-  const response = await nanoRPCCall<{ weight: string }>(context, config, 'account_weight', { account });
+  const response = await nanoRPCCall<AccountWeightRPCResponse>(context, config, 'account_weight', { account });
   return response.weight;
-}
-
-/** Options for account_history pagination */
-export interface AccountHistoryOptions {
-  /** Output all block parameters instead of simplified send/receive (default: true) */
-  raw?: boolean;
-  /** Use this block as head instead of latest (for pagination) */
-  head?: string;
-  /** Skip this many blocks from head */
-  offset?: number;
-  /** If true, list from head/first block toward frontier */
-  reverse?: boolean;
-  /** Filter to only show sends/receives with these accounts */
-  accountFilter?: string[];
-  /** Include linked_account field in response (v28.0+) */
-  includeLinkedAccount?: boolean;
 }
 
 /**
@@ -157,12 +145,6 @@ export async function getAccountHistory(
   return await nanoRPCCall<AccountHistoryRPCResponse>(context, config, 'account_history', params);
 }
 
-/** Options for accounts_balances */
-export interface AccountsBalancesOptions {
-  /** If true (default), only includes confirmed blocks. Set to false to include unconfirmed. (v22.0+) */
-  includeOnlyConfirmed?: boolean;
-}
-
 /**
  * Get balances for multiple accounts
  * @param accounts - Array of account addresses
@@ -195,24 +177,10 @@ export async function getAccountsFrontiers(
   config: INanoRPCConfig,
   accounts: string[]
 ): Promise<Record<string, string>> {
-  const response = await nanoRPCCall<{ frontiers: Record<string, string> }>(
+  const response = await nanoRPCCall<AccountsFrontiersRPCResponse>(
     context, config, 'accounts_frontiers', { accounts }
   );
   return response.frontiers;
-}
-
-/** Options for accounts_receivable */
-export interface AccountsReceivableOptions {
-  /** Maximum number of receivable blocks to return per account */
-  count?: number;
-  /** Minimum raw amount threshold to filter receivables */
-  threshold?: string;
-  /** Include source account information in response (v15.0+, default false) */
-  source?: boolean;
-  /** Sort receivables by amount descending (v19.0+, default false) */
-  sorting?: boolean;
-  /** Skip this many receivables from the start, for pagination (v19.0+) */
-  offset?: number;
 }
 
 /**
@@ -255,7 +223,7 @@ export async function getAccountsRepresentatives(
   config: INanoRPCConfig,
   accounts: string[]
 ): Promise<Record<string, string>> {
-  const response = await nanoRPCCall<{ representatives: Record<string, string> }>(
+  const response = await nanoRPCCall<AccountsRepresentativesRPCResponse>(
     context, config, 'accounts_representatives', { accounts }
   );
   return response.representatives;
@@ -265,7 +233,7 @@ export async function getAccountsRepresentatives(
  * Validate account address
  */
 export async function validateAccount(context: IExecuteFunctions, config: INanoRPCConfig, account: string): Promise<boolean> {
-  const response = await nanoRPCCall<{ valid: string }>(context, config, 'validate_account_number', { account });
+  const response = await nanoRPCCall<ValidateAccountRPCResponse>(context, config, 'validate_account_number', { account });
   return response.valid === '1';
 }
 

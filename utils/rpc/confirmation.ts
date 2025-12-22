@@ -1,43 +1,16 @@
 import type { IExecuteFunctions } from 'n8n-workflow';
-import { INanoRPCConfig, nanoRPCCall } from './core';
+import { nanoRPCCall } from './core';
 import type {
+  INanoRPCConfig,
   ConfirmationActiveRPCResponse,
   ConfirmationHistoryRPCResponse,
   ConfirmationInfoRPCResponse,
   ConfirmationQuorumRPCResponse,
   ElectionStatisticsRPCResponse,
-} from '../../nodes/Nano/types';
-
-/**
- * Options for getConfirmationActive
- */
-export interface ConfirmationActiveOptions {
-  /** Returns only active elections with equal or higher announcements count */
-  announcements?: number;
-  [key: string]: unknown;
-}
-
-/**
- * Options for getConfirmationInfo
- */
-export interface ConfirmationInfoOptions {
-  /** Returns list of votes representatives & its weights for each block. Default: false */
-  representatives?: boolean;
-  /** Disable contents for each block. Default: true */
-  contents?: boolean;
-  /** If true, "contents" will contain a JSON subtree instead of a JSON string. Default: false (v19.0+) */
-  json_block?: boolean;
-  [key: string]: unknown;
-}
-
-/**
- * Options for getConfirmationQuorum
- */
-export interface ConfirmationQuorumOptions {
-  /** If true, add account/ip/rep weight for each peer considered in the summation of peers_stake_total. Default: false (v17.0+) */
-  peer_details?: boolean;
-  [key: string]: unknown;
-}
+  ConfirmationActiveOptions,
+  ConfirmationInfoOptions,
+  ConfirmationQuorumOptions,
+} from '../../types/rpc';
 
 /**
  * Get currently active elections

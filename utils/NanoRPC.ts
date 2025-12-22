@@ -1,23 +1,56 @@
 import type { IExecuteFunctions } from 'n8n-workflow';
-import type { CreateBlockParams, BlockContents } from '../nodes/Nano/types';
-import {
+import type {
+  // Common types
   INanoRPCConfig,
+  CreateBlockParams,
+  BlockContents,
+  // Option types
+  AccountInfoOptions,
+  AccountHistoryOptions,
+  AccountsBalancesOptions,
+  AccountsReceivableOptions,
+  BlocksInfoOptions,
+  ProcessOptions,
+  ReceivableOptions,
+  ReceivableExistsOptions,
+  AccountRepresentativeSetOptions,
+  AccountsCreateOptions,
+  WalletAddOptions,
+  WalletLedgerOptions,
+  WalletReceivableOptions,
+  CreateAccountOptions,
+  GetDelegatorsOptions,
+  PeersOptions,
+  RepresentativesOnlineOptions,
+  ChainOptions,
+  LedgerOptions,
+  SuccessorsOptions,
+  ConfirmationActiveOptions,
+  ConfirmationInfoOptions,
+  ConfirmationQuorumOptions,
+  WorkGenerateOptions,
+  WorkValidateOptions,
+  SignOptions,
+  TelemetryOptions,
+  BootstrapOptions,
+  BootstrapAnyOptions,
+  BootstrapLazyOptions,
+  DatabaseTxnTrackerOptions,
+} from '../types/rpc';
+
+import {
   // Account operations
   getBalance,
   getAccountBlockCount,
   getAccountFromPublicKey,
   getAccountInfo,
-  AccountInfoOptions,
   getAccountKey,
   getAccountRepresentative,
   getAccountWeight,
   getAccountHistory,
-  AccountHistoryOptions,
   getAccountsBalances,
-  AccountsBalancesOptions,
   getAccountsFrontiers,
   getAccountsReceivable,
-  AccountsReceivableOptions,
   getAccountsRepresentatives,
   validateAccount,
   // Block operations
@@ -28,39 +61,29 @@ import {
   getBlockInfo,
   getBlocks,
   getBlocksInfo,
-  BlocksInfoOptions,
   getBlockCount,
   // Transaction operations
   process,
-  ProcessOptions,
   getReceivable,
-  ReceivableOptions,
   receivableExists,
-  ReceivableExistsOptions,
   epochUpgrade,
   send,
   receive,
-  getPending,
   // Wallet operations
   createAccount,
   listAccounts,
   accountMove,
   accountRemove,
   accountRepresentativeSet,
-  AccountRepresentativeSetOptions,
   accountsCreate,
-  AccountsCreateOptions,
   passwordChange,
   passwordEnter,
   passwordValid,
   receiveMinimum,
   receiveMinimumSet,
-  searchPending,
   searchReceivable,
-  searchPendingAll,
   searchReceivableAll,
   walletAdd,
-  WalletAddOptions,
   walletAddWatch,
   walletBalances,
   walletChangeSeed,
@@ -72,11 +95,9 @@ import {
   walletHistory,
   walletInfo,
   walletLedger,
-  WalletLedgerOptions,
   walletLock,
   walletLocked,
   walletReceivable,
-  WalletReceivableOptions,
   walletRepresentative,
   walletRepresentativeSet,
   walletRepublish,
@@ -93,45 +114,34 @@ import {
   getRepresentativesOnline,
   republish,
   getTelemetry,
-  TelemetryOptions,
   getVersion,
   getUptime,
-  PeersOptions,
   // Ledger operations
   getChain,
-  ChainOptions,
   getFrontiers,
   getFrontierCount,
   getLedger,
-  LedgerOptions,
   getSuccessors,
-  SuccessorsOptions,
   getUnopened,
   // Confirmation operations
   getConfirmationActive,
-  ConfirmationActiveOptions,
   getConfirmationHistory,
   getConfirmationInfo,
-  ConfirmationInfoOptions,
   getConfirmationQuorum,
-  ConfirmationQuorumOptions,
   getElectionStatistics,
   // Work operations
   cancelWork,
   generateWork,
-  WorkGenerateOptions,
   addWorkPeer,
   getWorkPeers,
   clearWorkPeers,
   validateWork,
-  WorkValidateOptions,
   // Key operations
   getDeterministicKey,
   createKey,
   expandKey,
   sign,
   signBlock,
-  SignOptions,
   // Representative operations
   getDelegators,
   getDelegatorsCount,
@@ -150,17 +160,13 @@ import {
   clearUnchecked,
   getUncheckedBlock,
   getUncheckedKeys,
-  BootstrapOptions,
-  BootstrapAnyOptions,
-  BootstrapLazyOptions,
-  DatabaseTxnTrackerOptions,
   // Conversion operations
   nanoToRawRPC,
   rawToNanoRPC,
 } from './rpc';
 
 // Re-export types for convenience
-export type { INanoRPCConfig, INanoRPCResponse } from './rpc';
+export type { INanoRPCConfig, INanoRPCResponse } from '../types/rpc';
 
 /**
  * Create a Nano RPC client with methods bound to the provided context and config
@@ -207,10 +213,9 @@ export function createNanoRPC(context: IExecuteFunctions, config: INanoRPCConfig
       send(context, config, wallet, source, destination, amountRaw, id, work),
     receive: (wallet: string, account: string, block: string, work?: string) =>
       receive(context, config, wallet, account, block, work),
-    getPending: (account: string, count?: number) => getPending(context, config, account, count),
 
     // Wallet Operations
-    createAccount: (wallet: string, options?: { index?: number; work?: boolean }) =>
+    createAccount: (wallet: string, options?: CreateAccountOptions) =>
       createAccount(context, config, wallet, options),
     listAccounts: (wallet: string) => listAccounts(context, config, wallet),
     accountMove: (wallet: string, source: string, accounts: string[]) =>
@@ -225,9 +230,7 @@ export function createNanoRPC(context: IExecuteFunctions, config: INanoRPCConfig
     passwordValid: (wallet: string) => passwordValid(context, config, wallet),
     receiveMinimum: () => receiveMinimum(context, config),
     receiveMinimumSet: (amount: string) => receiveMinimumSet(context, config, amount),
-    searchPending: (wallet: string) => searchPending(context, config, wallet),
     searchReceivable: (wallet: string) => searchReceivable(context, config, wallet),
-    searchPendingAll: () => searchPendingAll(context, config),
     searchReceivableAll: () => searchReceivableAll(context, config),
     walletAdd: (wallet: string, key: string, options?: WalletAddOptions) =>
       walletAdd(context, config, wallet, key, options),
@@ -263,7 +266,7 @@ export function createNanoRPC(context: IExecuteFunctions, config: INanoRPCConfig
     getPeers: (options?: PeersOptions) => getPeers(context, config, options),
     populateBacklog: () => populateBacklog(context, config),
     getRepresentatives: (count?: number, sorting?: boolean) => getRepresentatives(context, config, count, sorting),
-    getRepresentativesOnline: (weight?: boolean, accounts?: string[]) => getRepresentativesOnline(context, config, weight, accounts),
+    getRepresentativesOnline: (options?: RepresentativesOnlineOptions) => getRepresentativesOnline(context, config, options),
     republish: (hash: string, count?: number, sources?: number, destinations?: number) =>
       republish(context, config, hash, count, sources, destinations),
     getTelemetry: (options?: TelemetryOptions) => getTelemetry(context, config, options),
@@ -307,7 +310,7 @@ export function createNanoRPC(context: IExecuteFunctions, config: INanoRPCConfig
     signBlock: (options: SignOptions) => signBlock(context, config, options),
 
     // Representative Operations
-    getDelegators: (account: string, options?: { threshold?: string; count?: number; start?: string }) =>
+    getDelegators: (account: string, options?: GetDelegatorsOptions) =>
       getDelegators(context, config, account, options),
     getDelegatorsCount: (account: string) => getDelegatorsCount(context, config, account),
 

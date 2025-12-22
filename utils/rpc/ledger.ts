@@ -1,14 +1,16 @@
 import type { IExecuteFunctions } from 'n8n-workflow';
-import { INanoRPCConfig, nanoRPCCall } from './core';
-import type { LedgerRPCResponse } from '../../nodes/Nano/types';
-
-/** Options for chain RPC call */
-export interface ChainOptions {
-  /** Number of blocks to skip from start (v18.0+) */
-  offset?: number;
-  /** Return from open block to frontier instead of frontier to open (v18.0+) */
-  reverse?: boolean;
-}
+import { nanoRPCCall } from './core';
+import type {
+  INanoRPCConfig,
+  LedgerRPCResponse,
+  ChainOptions,
+  LedgerOptions,
+  SuccessorsOptions,
+  ChainRPCResponse,
+  FrontiersRPCResponse,
+  FrontierCountRPCResponse,
+  UnopenedRPCResponse,
+} from '../../types/rpc';
 
 /**
  * Get a consecutive sequence of block hashes in the account chain
@@ -30,7 +32,7 @@ export async function getChain(
   if (options?.reverse) {
     params.reverse = true;
   }
-  const response = await nanoRPCCall<{ blocks: string[] }>(context, config, 'chain', params);
+  const response = await nanoRPCCall<ChainRPCResponse>(context, config, 'chain', params);
   return response.blocks;
 }
 
@@ -43,7 +45,7 @@ export async function getFrontiers(
   account: string,
   count: number
 ): Promise<Record<string, string>> {
-  const response = await nanoRPCCall<{ frontiers: Record<string, string> }>(context, config, 'frontiers', { account, count });
+  const response = await nanoRPCCall<FrontiersRPCResponse>(context, config, 'frontiers', { account, count });
   return response.frontiers;
 }
 
@@ -51,26 +53,8 @@ export async function getFrontiers(
  * Get the total frontier block count
  */
 export async function getFrontierCount(context: IExecuteFunctions, config: INanoRPCConfig): Promise<number> {
-  const response = await nanoRPCCall<{ count: string }>(context, config, 'frontier_count');
+  const response = await nanoRPCCall<FrontierCountRPCResponse>(context, config, 'frontier_count');
   return parseInt(response.count);
-}
-
-/** Options for ledger RPC call */
-export interface LedgerOptions {
-  /** Number of accounts to return (ignored if sorting is true) */
-  count?: number;
-  /** Include representative for each account (default false) */
-  representative?: boolean;
-  /** Include voting weight for each account (default false) */
-  weight?: boolean;
-  /** Include receivable balance for each account (default false) */
-  receivable?: boolean;
-  /** Return only accounts modified after this UNIX timestamp (v11.0+, default 0) */
-  modifiedSince?: number;
-  /** Sort accounts by balance in descending order (default false). Note: count is ignored if sorting is true */
-  sorting?: boolean;
-  /** Return only accounts with balance above this threshold in raw (v19.0+, default 0). If receivable is also given, compares sum of balance and receivable. */
-  threshold?: string;
 }
 
 /**
@@ -111,14 +95,6 @@ export async function getLedger(
   return await nanoRPCCall<LedgerRPCResponse>(context, config, 'ledger', params);
 }
 
-/** Options for successors RPC call */
-export interface SuccessorsOptions {
-  /** Number of blocks to skip from start (v18.0+) */
-  offset?: number;
-  /** Return from frontier to open block instead of open to frontier (v18.0+) */
-  reverse?: boolean;
-}
-
 /**
  * Get successor blocks in the chain
  * @param block - Starting block hash
@@ -139,7 +115,7 @@ export async function getSuccessors(
   if (options?.reverse) {
     params.reverse = true;
   }
-  const response = await nanoRPCCall<{ blocks: string[] }>(context, config, 'successors', params);
+  const response = await nanoRPCCall<ChainRPCResponse>(context, config, 'successors', params);
   return response.blocks;
 }
 
@@ -152,6 +128,6 @@ export async function getUnopened(
   account?: string,
   count?: number
 ): Promise<Record<string, string>> {
-  const response = await nanoRPCCall<{ accounts: Record<string, string> }>(context, config, 'unopened', { account, count });
+  const response = await nanoRPCCall<UnopenedRPCResponse>(context, config, 'unopened', { account, count });
   return response.accounts;
 }

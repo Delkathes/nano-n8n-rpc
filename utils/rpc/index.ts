@@ -1,5 +1,88 @@
-// Re-export core types and utilities
-export { INanoRPCConfig, INanoRPCResponse, nanoRPCCall } from './core';
+// Re-export all types from centralized location
+export type {
+  // Common types
+  INanoRPCConfig,
+  INanoRPCResponse,
+  BlockContents,
+  BlockSubtype,
+  CreateBlockParams,
+  StateBlock,
+  // Account types
+  AccountInfoRPCResponse,
+  AccountHistoryRPCResponse,
+  AccountInfoOptions,
+  AccountHistoryOptions,
+  AccountsBalancesOptions,
+  AccountsReceivableOptions,
+  // Block types
+  BlockInfoRPCResponse,
+  BlockCreateResponse,
+  BlocksInfoResponse,
+  BlocksInfoOptions,
+  // Transaction types
+  ReceivableRPCResponse,
+  ProcessResponse,
+  ProcessOptions,
+  ReceivableOptions,
+  ReceivableExistsOptions,
+  // Wallet types
+  WalletBalancesRPCResponse,
+  WalletInfoRPCResponse,
+  WalletHistoryRPCResponse,
+  WalletLedgerRPCResponse,
+  WalletReceivableRPCResponse,
+  CreateAccountOptions,
+  AccountRepresentativeSetOptions,
+  AccountsCreateOptions,
+  WalletAddOptions,
+  WalletLedgerOptions,
+  WalletReceivableOptions,
+  // Network types
+  PeersRPCResponse,
+  RepresentativesOnlineRPCResponse,
+  TelemetryRPCResponse,
+  PeersOptions,
+  TelemetryOptions,
+  // Ledger types
+  LedgerRPCResponse,
+  ChainOptions,
+  LedgerOptions,
+  SuccessorsOptions,
+  // Confirmation types
+  ConfirmationActiveRPCResponse,
+  ConfirmationHistoryRPCResponse,
+  ConfirmationInfoRPCResponse,
+  ConfirmationQuorumRPCResponse,
+  ElectionStatisticsRPCResponse,
+  ConfirmationActiveOptions,
+  ConfirmationInfoOptions,
+  ConfirmationQuorumOptions,
+  // Work types
+  WorkGenerateResponse,
+  WorkValidateResponse,
+  WorkGenerateOptions,
+  WorkValidateOptions,
+  // Key types
+  KeyPairResponse,
+  SignRPCResponse,
+  SignOptions,
+  // Debug types
+  BootstrapStatusRPCResponse,
+  StatsRPCResponse,
+  UncheckedRPCResponse,
+  UncheckedKeysRPCResponse,
+  BootstrapPrioritiesRPCResponse,
+  DatabaseTxnTrackerRPCResponse,
+  BootstrapOptions,
+  BootstrapAnyOptions,
+  BootstrapLazyOptions,
+  DatabaseTxnTrackerOptions,
+  // Representative types
+  GetDelegatorsOptions,
+} from '../../types/rpc';
+
+// Re-export core utilities
+export { nanoRPCCall } from './core';
 
 // Re-export account operations
 export {
@@ -7,17 +90,13 @@ export {
   getAccountBlockCount,
   getAccountFromPublicKey,
   getAccountInfo,
-  AccountInfoOptions,
   getAccountKey,
   getAccountRepresentative,
   getAccountWeight,
   getAccountHistory,
-  AccountHistoryOptions,
   getAccountsBalances,
-  AccountsBalancesOptions,
   getAccountsFrontiers,
   getAccountsReceivable,
-  AccountsReceivableOptions,
   getAccountsRepresentatives,
   validateAccount,
 } from './account';
@@ -31,48 +110,35 @@ export {
   getBlockInfo,
   getBlocks,
   getBlocksInfo,
-  BlocksInfoOptions,
-  BlocksInfoResponse,
   getBlockCount,
 } from './block';
 
 // Re-export transaction operations
 export {
   process,
-  ProcessOptions,
-  ProcessResponse,
   getReceivable,
-  ReceivableOptions,
   receivableExists,
-  ReceivableExistsOptions,
   epochUpgrade,
   send,
   receive,
-  getPending,
 } from './transaction';
 
 // Re-export wallet operations
 export {
   createAccount,
-  CreateAccountOptions,
   listAccounts,
   accountMove,
   accountRemove,
   accountRepresentativeSet,
-  AccountRepresentativeSetOptions,
   accountsCreate,
-  AccountsCreateOptions,
   passwordChange,
   passwordEnter,
   passwordValid,
   receiveMinimum,
   receiveMinimumSet,
-  searchPending,
   searchReceivable,
-  searchPendingAll,
   searchReceivableAll,
   walletAdd,
-  WalletAddOptions,
   walletAddWatch,
   walletBalances,
   walletChangeSeed,
@@ -84,11 +150,9 @@ export {
   walletHistory,
   walletInfo,
   walletLedger,
-  WalletLedgerOptions,
   walletLock,
   walletLocked,
   walletReceivable,
-  WalletReceivableOptions,
   walletRepresentative,
   walletRepresentativeSet,
   walletRepublish,
@@ -103,13 +167,11 @@ export {
   keepalive,
   getNodeId,
   getPeers,
-  PeersOptions,
   populateBacklog,
   getRepresentatives,
   getRepresentativesOnline,
   republish,
   getTelemetry,
-  TelemetryOptions,
   getVersion,
   getUptime,
 } from './network';
@@ -117,25 +179,19 @@ export {
 // Re-export ledger operations
 export {
   getChain,
-  ChainOptions,
   getFrontiers,
   getFrontierCount,
   getLedger,
-  LedgerOptions,
   getSuccessors,
-  SuccessorsOptions,
   getUnopened,
 } from './ledger';
 
 // Re-export confirmation operations
 export {
   getConfirmationActive,
-  ConfirmationActiveOptions,
   getConfirmationHistory,
   getConfirmationInfo,
-  ConfirmationInfoOptions,
   getConfirmationQuorum,
-  ConfirmationQuorumOptions,
   getElectionStatistics,
 } from './confirmation';
 
@@ -143,14 +199,10 @@ export {
 export {
   cancelWork,
   generateWork,
-  WorkGenerateOptions,
-  WorkGenerateResponse,
   addWorkPeer,
   getWorkPeers,
   clearWorkPeers,
   validateWork,
-  WorkValidateOptions,
-  WorkValidateResponse,
 } from './work';
 
 // Re-export key operations
@@ -160,8 +212,6 @@ export {
   expandKey,
   sign,
   signBlock,
-  SignOptions,
-  SignResponse,
 } from './keys';
 
 // Re-export representative operations
@@ -186,10 +236,6 @@ export {
   clearUnchecked,
   getUncheckedBlock,
   getUncheckedKeys,
-  type BootstrapOptions,
-  type BootstrapAnyOptions,
-  type BootstrapLazyOptions,
-  type DatabaseTxnTrackerOptions,
 } from './debug';
 
 // Re-export conversion operations

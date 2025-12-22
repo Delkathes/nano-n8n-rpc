@@ -1,58 +1,19 @@
 import type { IExecuteFunctions } from 'n8n-workflow';
-import { INanoRPCConfig, nanoRPCCall } from './core';
-import type { BootstrapStatusRPCResponse, StatsRPCResponse, UncheckedRPCResponse, UncheckedKeysRPCResponse, BlockContents } from '../../nodes/Nano/types';
-
-/** Options for bootstrap command */
-export interface BootstrapOptions {
-  /** Disable frontier confirmation (v20.0-21.3). Default false */
-  bypassFrontierConfirmation?: boolean;
-  /** Set specific ID for bootstrap attempt (v21.0+) */
-  id?: string;
-}
-
-/** Options for bootstrap_any command */
-export interface BootstrapAnyOptions {
-  /** Force closing of all current bootstraps (v20.0+). Default false */
-  force?: boolean;
-  /** Set specific ID for bootstrap attempt (v21.0+) */
-  id?: string;
-  /** Target specific account on bootstrap (v22.0+) */
-  account?: string;
-}
-
-/** Options for bootstrap_lazy command */
-export interface BootstrapLazyOptions {
-  /** Force closing of all current bootstraps. Default false */
-  force?: boolean;
-  /** Set specific ID for bootstrap attempt (v21.0+) */
-  id?: string;
-}
-
-/** Options for database_txn_tracker command */
-export interface DatabaseTxnTrackerOptions {
-  /** Minimum read time in milliseconds to include in response */
-  minReadTime?: number;
-  /** Minimum write time in milliseconds to include in response */
-  minWriteTime?: number;
-}
-
-/** Response from bootstrap_priorities */
-export interface BootstrapPrioritiesRPCResponse {
-  priorities: Array<{
-    account: string;
-    priority: string;
-  }>;
-}
-
-/** Response from database_txn_tracker */
-export interface DatabaseTxnTrackerRPCResponse {
-  txn_tracking: Array<{
-    thread: string;
-    time_held_open: string;
-    write: string;
-    stacktrace?: string[];
-  }>;
-}
+import { nanoRPCCall } from './core';
+import type {
+  INanoRPCConfig,
+  BootstrapStatusRPCResponse,
+  StatsRPCResponse,
+  UncheckedRPCResponse,
+  UncheckedKeysRPCResponse,
+  BlockContents,
+  BootstrapOptions,
+  BootstrapAnyOptions,
+  BootstrapLazyOptions,
+  DatabaseTxnTrackerOptions,
+  BootstrapPrioritiesRPCResponse,
+  DatabaseTxnTrackerRPCResponse,
+} from '../../types/rpc';
 
 /**
  * Initialize bootstrap to a specific IP

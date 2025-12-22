@@ -1,24 +1,17 @@
 import type { IExecuteFunctions } from 'n8n-workflow';
-import { INanoRPCConfig, nanoRPCCall } from './core';
-import type { BlockContents, ReceivableRPCResponse, BlockSubtype } from '../../nodes/Nano/types';
-
-/** Options for process RPC call */
-export interface ProcessOptions {
-  /** Block subtype (v18.0+, highly recommended) */
-  subtype?: BlockSubtype;
-  /** Force fork resolution (v13.1+) */
-  force?: boolean;
-  /** Process asynchronously, returns immediately (v22.0+) */
-  async?: boolean;
-}
-
-/** Response from process RPC call */
-export interface ProcessResponse {
-  /** Block hash (when async=false) */
-  hash?: string;
-  /** Started status (when async=true) */
-  started?: string;
-}
+import { nanoRPCCall } from './core';
+import type {
+  INanoRPCConfig,
+  BlockContents,
+  ReceivableRPCResponse,
+  ProcessOptions,
+  ProcessResponse,
+  ReceivableOptions,
+  ReceivableExistsOptions,
+  ReceivableExistsRPCResponse,
+  SendRPCResponse,
+  ReceiveRPCResponse,
+} from '../../types/rpc';
 
 /**
  * Publish a block to the network
@@ -45,24 +38,6 @@ export async function process(
   }
 
   return await nanoRPCCall<ProcessResponse>(context, config, 'process', params);
-}
-
-/** Options for receivable RPC call */
-export interface ReceivableOptions {
-  /** Maximum number of blocks to return */
-  count?: number;
-  /** Minimum amount threshold in raw (v8.0+) */
-  threshold?: string;
-  /** Include source account information (v9.0+) */
-  source?: boolean;
-  /** Include active blocks without finished confirmations (v15.0+) */
-  includeActive?: boolean;
-  /** Return minimum epoch version for receiving (v15.0+) */
-  minVersion?: boolean;
-  /** Sort by amount descending (v19.0+, v22.0+ for absolute sorting with count) */
-  sorting?: boolean;
-  /** Only return confirmed blocks (v19.0+, default true in v22.0+) */
-  includeOnlyConfirmed?: boolean;
 }
 
 /**
@@ -104,14 +79,6 @@ export async function getReceivable(
   return await nanoRPCCall<ReceivableRPCResponse>(context, config, 'receivable', params);
 }
 
-/** Options for receivable_exists RPC call */
-export interface ReceivableExistsOptions {
-  /** Include active blocks without finished confirmations (v15.0+) */
-  includeActive?: boolean;
-  /** Only return confirmed blocks (v19.0+, default true in v22.0+) */
-  includeOnlyConfirmed?: boolean;
-}
-
 /**
  * Check if a receivable block exists
  */
@@ -131,7 +98,7 @@ export async function receivableExists(
     params.include_only_confirmed = false;
   }
   
-  const response = await nanoRPCCall<{ exists: string }>(context, config, 'receivable_exists', params);
+  const response = await nanoRPCCall<ReceivableExistsRPCResponse>(context, config, 'receivable_exists', params);
   return response.exists === '1';
 }
 
@@ -176,7 +143,7 @@ export async function send(
   if (work) {
     params.work = work;
   }
-  const response = await nanoRPCCall<{ block: string }>(context, config, 'send', params);
+  const response = await nanoRPCCall<SendRPCResponse>(context, config, 'send', params);
   return response.block;
 }
 
@@ -200,23 +167,7 @@ export async function receive(
   if (work) {
     params.work = work;
   }
-  const response = await nanoRPCCall<{ block: string }>(context, config, 'receive', params);
+  const response = await nanoRPCCall<ReceiveRPCResponse>(context, config, 'receive', params);
   return response.block;
-}
-
-/**
- * Get pending blocks for an account (deprecated, use getReceivable instead)
- */
-export async function getPending(
-  context: IExecuteFunctions,
-  config: INanoRPCConfig,
-  account: string,
-  count: number = 10
-): Promise<ReceivableRPCResponse> {
-  return await nanoRPCCall<ReceivableRPCResponse>(context, config, 'pending', {
-    account,
-    count,
-    source: true,
-  });
 }
 

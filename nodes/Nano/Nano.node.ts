@@ -15,8 +15,8 @@ import {
 	isValidNanoAddress,
 	formatNanoAmount,
 } from '../../utils/conversions';
-import type { ReceivableExistsOptions } from '../../utils/rpc';
-import type { NanoOperationResponse, PendingBlock, BlockContents, BlockSubtype } from './types';
+import type { ReceivableExistsOptions, BlockContents, BlockSubtype } from '../../types/rpc';
+import type { NanoOperationResponse } from '../../types/responses';
 
 export class Nano implements INodeType {
 	description: INodeTypeDescription = {
@@ -210,12 +210,6 @@ export class Nano implements INodeType {
 						value: 'history',
 						description: 'Get transaction history',
 						action: 'Get transaction history',
-					},
-					{
-						name: 'Get Pending',
-						value: 'pending',
-						description: 'List pending transactions',
-						action: 'List pending transactions',
 					},
 					{
 						name: 'Get Receivable',
@@ -510,18 +504,6 @@ export class Nano implements INodeType {
 						value: 'walletRepublish',
 						description: 'Republish blocks for accounts in a wallet',
 						action: 'Republish wallet blocks',
-					},
-					{
-						name: 'Search Pending',
-						value: 'searchPending',
-						description: 'Search for pending blocks in a wallet (deprecated)',
-						action: 'Search pending blocks',
-					},
-					{
-						name: 'Search Pending All',
-						value: 'searchPendingAll',
-						description: 'Search for pending blocks in all wallets (deprecated)',
-						action: 'Search all pending blocks',
 					},
 					{
 						name: 'Search Receivable',
@@ -998,6 +980,77 @@ export class Nano implements INodeType {
 				default: 'nanoToRawRPC',
 			},
 
+			// ===== ENABLE_CONTROL WARNING NOTICE =====
+			// These operations require `enable_control = true` in node config
+			{
+				displayName:
+					'This operation requires <code>enable_control = true</code> in your Nano node configuration. Without it, the RPC call will be rejected.',
+				name: 'enableControlNotice',
+				type: 'notice',
+				default: '',
+				displayOptions: {
+					show: {
+						operation: [
+							// Transaction operations
+							'send',
+							'receive',
+							'processBlock',
+							'epochUpgrade',
+							// Block operations
+							'createBlock',
+							// Wallet operations
+							'createAccount',
+							'accountsCreate',
+							'accountMove',
+							'accountRemove',
+							'accountRepresentativeSet',
+							'passwordChange',
+							'receiveMinimum',
+							'receiveMinimumSet',
+							'searchReceivable',
+							'searchReceivableAll',
+							'walletAdd',
+							'walletAddWatch',
+							'walletChangeSeed',
+							'walletCreate',
+							'walletDestroy',
+							'walletLedger',
+							'walletLock',
+							'walletReceivable',
+							'walletRepresentativeSet',
+							'walletRepublish',
+							'walletWorkGet',
+							'workGet',
+							'workSet',
+							// Network operations
+							'keepalive',
+							'populateBacklog',
+							// Ledger operations
+							'getLedger',
+							'getUnopened',
+							// Work operations
+							'generateWork',
+							'cancelWork',
+							'addWorkPeer',
+							'getWorkPeers',
+							'clearWorkPeers',
+							// Keys operations
+							'getNodeId',
+							// Administration/Debug operations
+							'stopNode',
+							'bootstrap',
+							'bootstrapAny',
+							'bootstrapLazy',
+							'resetBootstrap',
+							'getBootstrapPriorities',
+							'clearStats',
+							'clearUnchecked',
+							'getDatabaseTxnTracker',
+						],
+					},
+				},
+			},
+
 			// ===== SEND OPERATION =====
 			{
 				displayName: 'Destination Address',
@@ -1088,7 +1141,6 @@ export class Nano implements INodeType {
 							'accountRepresentative',
 							'accountWeight',
 							'history',
-							'pending',
 							'receivable',
 							'delegators',
 							'delegatorsCount',
@@ -1171,7 +1223,7 @@ export class Nano implements INodeType {
 				type: 'number',
 				displayOptions: {
 					show: {
-						operation: ['history', 'pending', 'receivable'],
+						operation: ['history', 'receivable'],
 					},
 				},
 				default: 10,
@@ -2877,12 +2929,12 @@ export class Nano implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
-						operation: ['searchPending', 'searchReceivable'],
+						operation: ['searchReceivable'],
 					},
 				},
 				default: '',
 				placeholder: 'Wallet ID',
-				description: 'Wallet ID to search for pending/receivable blocks',
+				description: 'Wallet ID to search for receivable blocks',
 			},
 			{
 				displayName: 'Private Key',
@@ -3546,7 +3598,10 @@ export class Nano implements INodeType {
 							? filterAccountsStr.split(',').map((a) => a.trim()).filter((a) => a.length > 0)
 							: undefined;
 
-						const repsOnline = await rpc.getRepresentativesOnline(includeWeight, filterAccounts);
+						const repsOnline = await rpc.getRepresentativesOnline({
+							weight: includeWeight || undefined,
+							accounts: filterAccounts,
+						});
 
 						responseData = {
 							representatives: repsOnline,
@@ -3628,36 +3683,6 @@ export class Nano implements INodeType {
 							receivedBlockHash: receiveBlockHash,
 							originalBlockHash: blockHash,
 							timestamp: new Date().toISOString(),
-						};
-						break;
-					}
-
-					case 'pending': {
-						const account = this.getNodeParameter('account', i) as string;
-						const count = this.getNodeParameter('count', i, 10) as number;
-
-						if (!isValidNanoAddress(account)) {
-							throw new NodeOperationError(this.getNode(), `Invalid account address: ${account}`, {
-								itemIndex: i,
-							});
-						}
-
-						const pendingData = await rpc.getPending(account, count);
-
-						// Format pending blocks
-						const formattedPending: PendingBlock[] = Object.entries(pendingData.blocks || {}).map(
-							([hash, data]) => ({
-								hash,
-								amount: rawToNano((data as { amount: string; source: string }).amount),
-								amountRaw: (data as { amount: string; source: string }).amount,
-								source: (data as { amount: string; source: string }).source,
-							}),
-						);
-
-						responseData = {
-							account,
-							pendingCount: formattedPending.length,
-							pendingBlocks: formattedPending,
 						};
 						break;
 					}
@@ -3866,18 +3891,6 @@ export class Nano implements INodeType {
 						break;
 					}
 
-					case 'searchPending': {
-						const searchWallet = this.getNodeParameter('searchWallet', i) as string;
-
-						const started = await rpc.searchPending(searchWallet);
-
-						responseData = {
-							success: true,
-							started,
-						};
-						break;
-					}
-
 					case 'searchReceivable': {
 						const searchWallet = this.getNodeParameter('searchWallet', i) as string;
 
@@ -3886,15 +3899,6 @@ export class Nano implements INodeType {
 						responseData = {
 							success: true,
 							started,
-						};
-						break;
-					}
-
-					case 'searchPendingAll': {
-						const success = await rpc.searchPendingAll();
-
-						responseData = {
-							success,
 						};
 						break;
 					}

@@ -1,12 +1,12 @@
 import type { IExecuteFunctions } from 'n8n-workflow';
-import { INanoRPCConfig, nanoRPCCall } from './core';
-
-/** Key pair response type */
-export interface KeyPairResponse {
-  private: string;
-  public: string;
-  account: string;
-}
+import { nanoRPCCall } from './core';
+import type {
+  INanoRPCConfig,
+  KeyPairResponse,
+  SignOptions,
+  SignRPCResponse,
+  DeterministicKeyRPCResponse,
+} from '../../types/rpc';
 
 /**
  * Derive deterministic keypair from seed based on index
@@ -16,8 +16,8 @@ export async function getDeterministicKey(
   config: INanoRPCConfig,
   seed: string,
   index: number
-): Promise<KeyPairResponse> {
-  const response = await nanoRPCCall<KeyPairResponse>(context, config, 'deterministic_key', { seed, index });
+): Promise<DeterministicKeyRPCResponse> {
+  const response = await nanoRPCCall<DeterministicKeyRPCResponse>(context, config, 'deterministic_key', { seed, index });
   return {
     private: response.private,
     public: response.public,
@@ -50,32 +50,6 @@ export async function expandKey(context: IExecuteFunctions, config: INanoRPCConf
 }
 
 /**
- * Options for signing
- */
-export interface SignOptions {
-  /** Private key to sign with (alternative to wallet+account) */
-  key?: string;
-  /** Wallet ID (alternative to key, requires account) */
-  wallet?: string;
-  /** Account in wallet to sign with (requires wallet) */
-  account?: string;
-  /** Block to sign (alternative to hash) */
-  block?: Record<string, unknown>;
-  /** Hash to sign directly (requires rpc.enable_sign_hash config) */
-  hash?: string;
-}
-
-/**
- * Response from sign operation
- */
-export interface SignResponse {
-  /** The generated signature */
-  signature: string;
-  /** The signed block with updated signature (if block was provided) */
-  block?: Record<string, unknown>;
-}
-
-/**
  * Sign a block hash with a private key
  * @deprecated Use signBlock for more options
  */
@@ -98,7 +72,7 @@ export async function signBlock(
   context: IExecuteFunctions,
   config: INanoRPCConfig,
   options: SignOptions
-): Promise<SignResponse> {
+): Promise<SignRPCResponse> {
   const params: Record<string, unknown> = {};
 
   // Set signing credentials - either key or wallet+account
@@ -117,6 +91,6 @@ export async function signBlock(
     params.hash = options.hash;
   }
 
-  const response = await nanoRPCCall<SignResponse>(context, config, 'sign', params);
+  const response = await nanoRPCCall<SignRPCResponse>(context, config, 'sign', params);
   return response;
 }

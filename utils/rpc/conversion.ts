@@ -1,5 +1,6 @@
 import type { IExecuteFunctions } from 'n8n-workflow';
-import { INanoRPCConfig, nanoRPCCall } from './core';
+import { nanoRPCCall } from './core';
+import type { INanoRPCConfig } from '../../types/rpc';
 
 /**
  * Convert Nano amount to raw
