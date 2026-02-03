@@ -12,10 +12,14 @@ import { createNanoRPC } from '../../libs/nano-rpc/nano-rpc';
 import {
 	nanoToRaw,
 	rawToNano,
-	isValidNanoAddress,
 	formatNanoAmount,
-	isValidWalletId,
 } from '../../utils/conversions';
+
+import {
+	isValidBlockHash,
+	isValidNanoAddress,
+	isValidWalletId,
+} from '../../utils/validation';
 
 import type * as rpcTypes from '../../types';
 
@@ -362,6 +366,12 @@ export class NanoRPC implements INodeType {
 					case 'blockAccount': {
 						const blockHash = this.getNodeParameter('blockHash', i) as string;
 
+						if (!isValidBlockHash(blockHash)) {
+							throw new NodeOperationError(this.getNode(), `Invalid block hash: ${blockHash}`, {
+								itemIndex: i,
+							});
+						}
+
 						const account = await rpc.getBlockAccount(blockHash);
 
 						responseData = {
@@ -487,12 +497,26 @@ export class NanoRPC implements INodeType {
 						const blockHash = this.getNodeParameter('blockHash', i) as string;
 						const work = this.getNodeParameter('receiveWork', i, '') as string;
 
+						if (!isValidWalletId(manualWalletId.length > 0 ? manualWalletId : credentialsWalletId)) {
+							throw new NodeOperationError(
+								this.getNode(),
+								`Invalid wallet ID: ${manualWalletId.length > 0 ? manualWalletId : credentialsWalletId}`,
+								{ itemIndex: i },
+							);
+						}
+
 						if (!isValidNanoAddress(receivingAccount)) {
 							throw new NodeOperationError(
 								this.getNode(),
 								`Invalid receiving account address: ${receivingAccount}`,
 								{ itemIndex: i },
 							);
+						}
+
+						if (!isValidBlockHash(blockHash)) {
+							throw new NodeOperationError(this.getNode(), `Invalid block hash: ${blockHash}`, {
+								itemIndex: i,
+							});
 						}
 
 						const receiveBlockHash = await rpc.receive(
@@ -528,6 +552,12 @@ export class NanoRPC implements INodeType {
 						const blockHash = this.getNodeParameter('blockHash', i) as string;
 						const jsonBlock = this.getNodeParameter('jsonBlock', i, true) as boolean;
 						const includeLinkedAccount = this.getNodeParameter('includeLinkedAccount', i, false) as boolean;
+
+						if (!isValidBlockHash(blockHash)) {
+							throw new NodeOperationError(this.getNode(), `Invalid block hash: ${blockHash}`, {
+								itemIndex: i,
+							});
+						}
 
 						const blockInfo = await rpc.getBlockInfo(blockHash, jsonBlock, includeLinkedAccount);
 
@@ -1404,6 +1434,12 @@ export class NanoRPC implements INodeType {
 					case 'confirmBlock': {
 						const blockHash = this.getNodeParameter('blockHash', i) as string;
 
+						if (!isValidBlockHash(blockHash)) {
+							throw new NodeOperationError(this.getNode(), `Invalid block hash: ${blockHash}`, {
+								itemIndex: i,
+							});
+						}
+
 						const confirmed = await rpc.confirmBlock(blockHash);
 
 						responseData = {
@@ -1415,6 +1451,14 @@ export class NanoRPC implements INodeType {
 					case 'getBlocks': {
 						const blockHashesStr = this.getNodeParameter('blockHashes', i) as string;
 						const blockHashes = blockHashesStr.split(',').map((h) => h.trim());
+
+						for (const hash of blockHashes) {
+							if (!isValidBlockHash(hash)) {
+								throw new NodeOperationError(this.getNode(), `Invalid block hash: ${hash}`, {
+									itemIndex: i,
+								});
+							}
+						}
 
 						const blocks = await rpc.getBlocks(blockHashes);
 
@@ -1432,6 +1476,14 @@ export class NanoRPC implements INodeType {
 						const includeSource = this.getNodeParameter('blocksInfoSource', i, false) as boolean;
 						const includeReceiveHash = this.getNodeParameter('blocksInfoReceiveHash', i, false) as boolean;
 						const includeLinkedAccount = this.getNodeParameter('blocksInfoIncludeLinkedAccount', i, false) as boolean;
+
+						for (const hash of blockHashes) {
+							if (!isValidBlockHash(hash)) {
+								throw new NodeOperationError(this.getNode(), `Invalid block hash: ${hash}`, {
+									itemIndex: i,
+								});
+							}
+						}
 
 						const blocksInfoOptions = {
 							...(includeNotFound && { includeNotFound }),
@@ -1458,6 +1510,12 @@ export class NanoRPC implements INodeType {
 						const includeActive = this.getNodeParameter('receiveExistsIncludeActive', i, false) as boolean;
 						const includeOnlyConfirmed = this.getNodeParameter('receiveExistsIncludeOnlyConfirmed', i, true) as boolean;
 
+						if (!isValidBlockHash(blockHash)) {
+							throw new NodeOperationError(this.getNode(), `Invalid block hash: ${blockHash}`, {
+								itemIndex: i,
+							});
+						}
+
 						const options: rpcTypes.ReceivableExistsOptions = {};
 						if (includeActive) options.includeActive = true;
 						if (!includeOnlyConfirmed) options.includeOnlyConfirmed = false;
@@ -1476,6 +1534,12 @@ export class NanoRPC implements INodeType {
 						const count = this.getNodeParameter('count', i, 10) as number;
 						const offset = this.getNodeParameter('chainOffset', i, 0) as number;
 						const reverse = this.getNodeParameter('chainReverse', i, false) as boolean;
+
+						if (!isValidBlockHash(blockHash)) {
+							throw new NodeOperationError(this.getNode(), `Invalid block hash: ${blockHash}`, {
+								itemIndex: i,
+							});
+						}
 
 						const options: { offset?: number; reverse?: boolean } = {};
 						if (offset > 0) options.offset = offset;
@@ -1552,6 +1616,12 @@ export class NanoRPC implements INodeType {
 						const includeContents = this.getNodeParameter('includeContents', i, true) as boolean;
 						const jsonBlock = this.getNodeParameter('confirmationJsonBlock', i, true) as boolean;
 
+						if (!isValidBlockHash(blockHash)) {
+							throw new NodeOperationError(this.getNode(), `Invalid block hash: ${blockHash}`, {
+								itemIndex: i,
+							});
+						}
+
 						const confirmationInfo = await rpc.getConfirmationInfo(blockHash, {
 							representatives: includeRepresentatives,
 							contents: includeContents,
@@ -1573,6 +1643,12 @@ export class NanoRPC implements INodeType {
 						const workAccount = this.getNodeParameter('workAccount', i, '') as string;
 						const workVersion = this.getNodeParameter('workVersion', i, '') as string;
 						const workBlockJson = this.getNodeParameter('workBlock', i, '') as string;
+
+						if (!isValidBlockHash(blockHash)) {
+							throw new NodeOperationError(this.getNode(), `Invalid block hash: ${blockHash}`, {
+								itemIndex: i,
+							});
+						}
 
 						// Build options object
 						const options: Record<string, unknown> = {};
@@ -1620,6 +1696,12 @@ export class NanoRPC implements INodeType {
 						const difficulty = this.getNodeParameter('difficulty', i, '') as string;
 						const multiplier = this.getNodeParameter('workMultiplier', i, 0) as number;
 						const version = this.getNodeParameter('workVersion', i, '') as string;
+
+						if (!isValidBlockHash(blockHash)) {
+							throw new NodeOperationError(this.getNode(), `Invalid block hash: ${blockHash}`, {
+								itemIndex: i,
+							});
+						}
 
 						const validationResult = await rpc.validateWork(work, blockHash, {
 							difficulty: difficulty || undefined,
@@ -1693,6 +1775,13 @@ export class NanoRPC implements INodeType {
 						} else {
 							// hash input
 							const hashToSign = this.getNodeParameter('hashToSign', i) as string;
+
+							if (!isValidBlockHash(hashToSign)) {
+							throw new NodeOperationError(this.getNode(), `Invalid block hash: ${hashToSign}`, {
+								itemIndex: i,
+							});
+						}
+
 							signOptions.hash = hashToSign;
 						}
 
@@ -2085,6 +2174,12 @@ export class NanoRPC implements INodeType {
 						const sources = this.getNodeParameter('sources', i, 2) as number;
 						const destinations = this.getNodeParameter('destinations', i, 2) as number;
 
+						if (!isValidBlockHash(republishHash)) {
+							throw new NodeOperationError(this.getNode(), `Invalid block hash: ${republishHash}`, {
+								itemIndex: i,
+							});
+						}
+
 						const result = await rpc.republish(republishHash, count, sources, destinations);
 
 						responseData = {
@@ -2161,6 +2256,12 @@ export class NanoRPC implements INodeType {
 
 					case 'getConfirmationHistory': {
 						const confirmationHash = this.getNodeParameter('confirmationHash', i, '') as string;
+
+						if (!isValidBlockHash(confirmationHash)) {
+							throw new NodeOperationError(this.getNode(), `Invalid block hash: ${confirmationHash}`, {
+								itemIndex: i,
+							});
+						}
 
 						const history = await rpc.getConfirmationHistory(confirmationHash || undefined);
 
@@ -2333,6 +2434,12 @@ export class NanoRPC implements INodeType {
 
 					case 'getUncheckedBlock': {
 						const uncheckedHash = this.getNodeParameter('uncheckedHash', i) as string;
+
+						if (!isValidBlockHash(uncheckedHash)) {
+							throw new NodeOperationError(this.getNode(), `Invalid block hash: ${uncheckedHash}`, {
+								itemIndex: i,
+							});
+						}
 
 						const block = await rpc.getUncheckedBlock(uncheckedHash);
 

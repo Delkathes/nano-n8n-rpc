@@ -73,7 +73,7 @@ export class NanoTrigger implements INodeType {
 		try {
 			parsedBlock  = JSON.parse(bodyData.block);
 		} catch (error) {
-			throw new Error('Failed to parse block data from webhook payload');
+			throw new Error(`Failed to parse block data from webhook payload, ${error.message}`);
 		}
 
 		// Convert amount to Nano
@@ -140,7 +140,7 @@ export interface NanoCallbackPayload {
  * Account info response from RPC
  */
 export interface NanoAccountInfo {
-	balance: number;
+	balance: bigint;
 	balanceRaw: string;
 	representative: string;
 	blockCount: string;
@@ -210,7 +210,9 @@ async function validateBlockSignature(
 		const credentials = await context.getCredentials('nanoApi');
 		const rpcUrl = credentials.rpcUrl as string;
 
-		const validationResult = await context.helpers.httpRequest({
+		const httpRequestWithAuthentication = context.helpers.httpRequestWithAuthentication.bind(context);
+
+		const validationResult = await httpRequestWithAuthentication('nanoApi',{
 			method: 'POST',
 			url: rpcUrl,
 			body: {
@@ -238,7 +240,9 @@ async function fetchAccountInfo(
 		const credentials = await context.getCredentials('nanoApi');
 		const rpcUrl = credentials.rpcUrl as string;
 
-		const accountInfo = await context.helpers.httpRequest({
+		const httpRequestWithAuthentication = context.helpers.httpRequestWithAuthentication.bind(context);
+
+		const accountInfo = await httpRequestWithAuthentication('nanoApi', {
 			method: 'POST',
 			url: rpcUrl,
 			body: {
@@ -252,7 +256,7 @@ async function fetchAccountInfo(
         });
 
 		return {
-			balance: Number(rawToNano(accountInfo.balance)),
+			balance: BigInt(rawToNano(accountInfo.balance)),
 			balanceRaw: accountInfo.balance,
 			representative: accountInfo.representative,
 			blockCount: accountInfo.block_count,

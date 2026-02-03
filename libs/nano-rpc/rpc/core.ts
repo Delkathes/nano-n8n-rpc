@@ -1,4 +1,4 @@
-import type { IExecuteFunctions, IHttpRequestMethods } from 'n8n-workflow';
+import { NodeOperationError, type IExecuteFunctions, type IHttpRequestMethods } from 'n8n-workflow';
 import type { INanoRPCConfig, INanoRPCResponse } from '../../../types/rpc';
 
 // Re-export types for convenience from core
@@ -34,7 +34,7 @@ export async function nanoRPCCall<T = INanoRPCResponse>(
 
     // Check for RPC errors
     if (data.error) {
-      throw new Error(`Nano RPC Error: ${data.error}`);
+      throw new NodeOperationError(context.getNode(), `Nano RPC Error: ${data.error}`);
     }
 
     return data as T;

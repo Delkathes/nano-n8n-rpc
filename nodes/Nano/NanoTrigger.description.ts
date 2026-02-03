@@ -16,7 +16,7 @@ export const NanoTriggerDescription: INodeTypeDescription = {
 	credentials: [
 		{
 			name: 'nanoApi',
-			required: false,
+			required: true,
 		},
 	],
 	webhooks: [
