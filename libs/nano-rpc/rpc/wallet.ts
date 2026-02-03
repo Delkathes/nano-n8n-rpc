@@ -61,7 +61,7 @@ export async function createAccount(
 
   // Only send work=false when explicitly disabled (default is true)
   if (options.work === false) {
-    params.work = 'false';
+    params.work = false;
   }
 
   const response = await nanoRPCCall<AccountCreateRPCResponse>(context, config, 'account_create', params);
@@ -143,7 +143,7 @@ export async function accountsCreate(
 
   // Only send work=true when explicitly enabled (default is false in v11.2+)
   if (options.work === true) {
-    params.work = 'true';
+    params.work = true;
   }
 
   const response = await nanoRPCCall<AccountsCreateRPCResponse>(context, config, 'accounts_create', params);
@@ -242,7 +242,7 @@ export async function walletAdd(
 
   // Only send work=false when explicitly disabled (default is true)
   if (options.work === false) {
-    params.work = 'false';
+    params.work = false;
   }
 
   const response = await nanoRPCCall<WalletAddRPCResponse>(context, config, 'wallet_add', params);

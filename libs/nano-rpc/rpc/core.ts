@@ -19,7 +19,9 @@ export async function nanoRPCCall<T = INanoRPCResponse>(
   };
 
   try {
-    const data = await context.helpers.httpRequest({
+    const httpRequestWithAuth = context.helpers.httpRequestWithAuthentication.bind(context);
+
+    const data = await httpRequestWithAuth('nanoApi', {
       method: 'POST' as IHttpRequestMethods,
       url: config.rpcUrl,
       headers: {

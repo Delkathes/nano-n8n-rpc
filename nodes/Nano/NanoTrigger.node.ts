@@ -68,7 +68,13 @@ export class NanoTrigger implements INodeType {
 
 		// Parse incoming request data
 		const bodyData = parseRequestBody(this);
-        const parsedBlock: BlockContents = JSON.parse(bodyData.block);
+		let parsedBlock: BlockContents
+
+		try {
+			parsedBlock  = JSON.parse(bodyData.block);
+		} catch (error) {
+			throw new Error('Failed to parse block data from webhook payload');
+		}
 
 		// Convert amount to Nano
         const amountNano = Number(rawToNano(bodyData.amount));

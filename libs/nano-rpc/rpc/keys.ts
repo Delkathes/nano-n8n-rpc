@@ -85,7 +85,7 @@ export async function signBlock(
 
   // Set what to sign - either block or hash
   if (options.block) {
-    params.json_block = 'true';
+    params.json_block = true;
     params.block = options.block;
   } else if (options.hash) {
     params.hash = options.hash;

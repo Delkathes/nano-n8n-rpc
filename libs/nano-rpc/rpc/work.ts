@@ -36,7 +36,7 @@ export async function generateWork(
     params.multiplier = options.multiplier.toString();
   }
   if (options.usePeers === true) {
-    params.use_peers = 'true';
+    params.use_peers = true;
   }
   if (options.account) {
     params.account = options.account;
@@ -47,7 +47,7 @@ export async function generateWork(
   if (options.block) {
     params.block = options.block;
     // json_block must be true when block is a JSON object
-    params.json_block = 'true';
+    params.json_block = true;
   }
 
   const response = await nanoRPCCall<WorkGenerateResponse>(context, config, 'work_generate', params);

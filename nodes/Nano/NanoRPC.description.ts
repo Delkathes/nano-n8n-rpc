@@ -18,7 +18,7 @@ export const NanoRPCDescription: INodeTypeDescription = {
     credentials: [
         {
             name: 'nanoApi',
-            required: false,
+            required: true,
         },
     ],
     codex: {
