@@ -37,16 +37,51 @@ export async function confirmBlock(context: IExecuteFunctions, config: INanoRPCC
 export async function createBlock(
   context: IExecuteFunctions,
   config: INanoRPCConfig,
-  params: CreateBlockParams
+  blockparams: CreateBlockParams
 ): Promise<BlockCreateResponse> {
+  const { work, balance, type, account, destination, difficulty, json_block, key, link, previous, representative, source, version, wallet } = blockparams;
+  const params: Record<string, unknown> = { balance, type, previous, representative, json_block };
+
+  if (work) {
+    params.work = work
+  }
+  if (account) {
+    params.account = account
+  }
+  if (version) {
+    params.version = version;
+  }
+  if (source) {
+    params.source = source;
+  }
+  if (wallet) {
+    params.wallet = wallet;
+  }
+  if (link) {
+    params.link = link;
+  }
+  if (key) {
+    params.key = key;
+  }
+  if (destination) {
+    params.destination = destination;
+  }
+  if (difficulty) {
+    params.difficulty = difficulty;
+  }
+
   return await nanoRPCCall<BlockCreateResponse>(context, config, 'block_create', params);
 }
 
 /**
  * Calculate hash for a block
  */
-export async function getBlockHash(context: IExecuteFunctions, config: INanoRPCConfig, block: BlockContents): Promise<string> {
-  const response = await nanoRPCCall<BlockHashRPCResponse>(context, config, 'block_hash', { block });
+export async function getBlockHash(context: IExecuteFunctions, config: INanoRPCConfig, block: BlockContents, jsonBlock: boolean = true): Promise<string> {
+  const params: Record<string, BlockContents | boolean> = {
+    block,
+    json_block: jsonBlock,
+  };
+  const response = await nanoRPCCall<BlockHashRPCResponse>(context, config, 'block_hash', params);
   return response.hash;
 }
 

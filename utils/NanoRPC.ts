@@ -193,7 +193,7 @@ export function createNanoRPC(context: IExecuteFunctions, config: INanoRPCConfig
     getBlockAccount: (hash: string) => getBlockAccount(context, config, hash),
     confirmBlock: (hash: string) => confirmBlock(context, config, hash),
     createBlock: (params: CreateBlockParams) => createBlock(context, config, params),
-    getBlockHash: (block: BlockContents) => getBlockHash(context, config, block),
+    getBlockHash: (block: BlockContents, jsonBlock?: boolean) => getBlockHash(context, config, block, jsonBlock),
     getBlockInfo: (hash: string, jsonBlock?: boolean, includeLinkedAccount?: boolean) =>
       getBlockInfo(context, config, hash, jsonBlock, includeLinkedAccount),
     getBlocks: (hashes: string[]) => getBlocks(context, config, hashes),
@@ -218,8 +218,8 @@ export function createNanoRPC(context: IExecuteFunctions, config: INanoRPCConfig
     createAccount: (wallet: string, options?: CreateAccountOptions) =>
       createAccount(context, config, wallet, options),
     listAccounts: (wallet: string) => listAccounts(context, config, wallet),
-    accountMove: (wallet: string, source: string, accounts: string[]) =>
-      accountMove(context, config, wallet, source, accounts),
+    accountMove: (source: string, wallet: string, accounts: string[]) =>
+      accountMove(context, config, source, wallet, accounts),
     accountRemove: (wallet: string, account: string) => accountRemove(context, config, wallet, account),
     accountRepresentativeSet: (wallet: string, account: string, representative: string, options?: AccountRepresentativeSetOptions) =>
       accountRepresentativeSet(context, config, wallet, account, representative, options),

@@ -82,8 +82,8 @@ export async function listAccounts(context: IExecuteFunctions, config: INanoRPCC
 export async function accountMove(
   context: IExecuteFunctions,
   config: INanoRPCConfig,
-  wallet: string,
   source: string,
+  wallet: string,
   accounts: string[]
 ): Promise<number> {
   const response = await nanoRPCCall<AccountMoveRPCResponse>(context, config, 'account_move', { wallet, source, accounts });

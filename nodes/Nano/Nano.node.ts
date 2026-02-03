@@ -138,7 +138,7 @@ export class Nano implements INodeType {
 						name: 'Get Account Block Count',
 						value: 'accountBlockCount',
 						description:
-							'Get the total number of blocks (transactions) that have been confirmed for a specific Nano account. Requires account address. Returns the block count as a number.',
+							'Get the total number of blocks (transactions) that have been confirmed for a specific Nano account. Requires account address. Returns the block count as a number',
 						action: 'Get account block count',
 					},
 					{
@@ -157,21 +157,21 @@ export class Nano implements INodeType {
 						name: 'Get Account Key',
 						value: 'accountKey',
 						description:
-							'Retrieve the public key (64 character hex string) associated with a Nano account address. Requires account address. Returns the public key used for cryptographic operations.',
+							'Retrieve the public key (64 character hex string) associated with a Nano account address. Requires account address. Returns the public key used for cryptographic operations',
 						action: 'Get account public key',
 					},
 					{
 						name: 'Get Account Representative',
 						value: 'accountRepresentative',
 						description:
-							'Get the current voting representative (delegate) for a Nano account. Requires account address. Returns representative account address.',
+							'Get the current voting representative (delegate) for a Nano account. Requires account address. Returns representative account address',
 						action: 'Get account representative',
 					},
 					{
 						name: 'Get Account Weight',
 						value: 'accountWeight',
 						description:
-							'Get the total voting weight delegated to a representative account in raw units. Requires account address. Returns voting weight.',
+							'Get the total voting weight delegated to a representative account in raw units. Requires account address. Returns voting weight',
 						action: 'Get account weight',
 					},
 					{
@@ -1466,6 +1466,7 @@ export class Nano implements INodeType {
 							'getConfirmationInfo',
 							'generateWork',
 							'getChain',
+							'validateWork',
 						],
 					},
 				},
@@ -1479,7 +1480,7 @@ export class Nano implements INodeType {
 				type: 'boolean',
 				displayOptions: {
 					show: {
-						operation: ['blockInfo'],
+						operation: ['blockInfo', 'getBlockHash', 'createBlock'],
 					},
 				},
 				default: true,
@@ -1816,12 +1817,25 @@ export class Nano implements INodeType {
 				description: 'Proof of work to validate',
 			},
 			{
+				displayName: 'Work',
+				name: 'workCreateBlock',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['createBlock'],
+					},
+				},
+				default: '',
+				placeholder: 'Work hex string',
+				description: 'Work value (16 hexadecimal digits string, 64 bit). Uses work value for block from external source.',
+			},
+			{
 				displayName: 'Difficulty',
 				name: 'difficulty',
 				type: 'string',
 				displayOptions: {
 					show: {
-						operation: ['generateWork', 'validateWork'],
+						operation: ['generateWork', 'validateWork', 'createBlock'],
 					},
 				},
 				default: '',
@@ -1873,7 +1887,7 @@ export class Nano implements INodeType {
 				type: 'string',
 				displayOptions: {
 					show: {
-						operation: ['generateWork', 'validateWork'],
+						operation: ['generateWork', 'validateWork', 'createBlock'],
 					},
 				},
 				default: '',
@@ -2391,6 +2405,7 @@ export class Nano implements INodeType {
 					},
 				},
 				options: [
+					{ name: 'State', value: 'state' },
 					{ name: 'Send', value: 'send' },
 					{ name: 'Receive', value: 'receive' },
 					{ name: 'Change', value: 'change' },
@@ -2399,13 +2414,136 @@ export class Nano implements INodeType {
 				description: 'Type of block to create',
 			},
 			{
+				displayName: 'Balance',
+				name: 'balance',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						operation: ['createBlock'],
+					},
+				},
+				default: '',
+				placeholder: '15000000000000000000000',
+				description: "Final balance for account after block creation, formatted in 'raw' units using a decimal integer. If balance is less than previous, block is considered as send subtype!",
+			},
+			{
+				displayName: 'Wallet',
+				name: 'wallet',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['createBlock'],
+					},
+				},
+				default: '',
+				placeholder: 'Wallet ID',
+				description: 'The wallet ID that the account the block is being created for is in.',
+			},
+			{
+				displayName: 'Account Address',
+				name: 'createBlockAccount',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['createBlock'],
+					},
+				},
+				default: '',
+				placeholder: 'nano_1abc...',
+				description: 'The account the block is being created for.',
+			},
+			{
+				displayName: 'Private Key',
+				name: 'privateKey',
+				type: 'string',
+				typeOptions: {
+					password: true,
+				},
+				displayOptions: {
+					show: {
+						operation: ['createBlock'],
+					},
+				},
+				default: '',
+				placeholder: '64-character hex string',
+				description: 'Instead of using "wallet" & "account" parameters, you can directly pass in a private key.',
+			},
+			{
+				displayName: 'Source',
+				name: 'source',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['createBlock'],
+					},
+				},
+				default: '',
+				placeholder: 'Block hash',
+				description: 'The block hash of the source of funds for this receive block (the send block that this receive block will pocket).',
+			},
+			{
+				displayName: 'Destination Address',
+				name: 'destination',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['createBlock'],
+					},
+				},
+				default: '',
+				placeholder: 'nano_1abc...',
+				description: 'The account that the sent funds should be accessible to.',
+			},
+			{
+				displayName: 'Link',
+				name: 'link',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['createBlock'],
+					},
+				},
+				default: '',
+				placeholder: 'Public key or Block hash',
+				description: 'Instead of using "source" and "destination" parameters, you can directly pass "link". If the block is sending funds, set link to the public key of the destination account. If it is receiving funds, set link to the hash of the block to receive. If the block has no balance change but is updating representative only, set link to 0.',
+			},
+			{
+				displayName: 'Representative',
+				name: 'representative',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						operation: ['createBlock'],
+					},
+				},
+				default: '',
+				placeholder: 'nano_1abc...',
+				description: 'The account that block account will use as its representative.',
+			},
+			{
+				displayName: 'Previous',
+				name: 'previous',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						operation: ['createBlock'],
+					},
+				},
+				default: '',
+				placeholder: 'Block hash',
+				description: `The block hash of the previous block on this account's block chain ("0" for first block).`,
+			},
+			{
 				displayName: 'Block Parameters',
 				name: 'blockParams',
 				type: 'json',
 				required: true,
 				displayOptions: {
 					show: {
-						operation: ['createBlock', 'getBlockHash'],
+						operation: ['getBlockHash'],
 					},
 				},
 				default: '{}',
@@ -2781,8 +2919,21 @@ export class Nano implements INodeType {
 				description: 'Whether to generate work after creating account (v9.0+). Disabling can speed up account creation.',
 			},
 			{
-				displayName: 'Source Wallet',
+				displayName: 'Source Wallet (Manual)',
 				name: 'sourceWallet',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: ['accountMove'],
+					},
+				},
+				default: '',
+				placeholder: 'Source wallet ID',
+				description: 'Wallet ID to move accounts from (optional). default to credential wallet',
+			},
+			{
+				displayName: 'Target Wallet',
+				name: 'targetWallet',
 				type: 'string',
 				required: true,
 				displayOptions: {
@@ -2791,8 +2942,8 @@ export class Nano implements INodeType {
 					},
 				},
 				default: '',
-				placeholder: 'Source wallet ID',
-				description: 'Wallet ID to move accounts from',
+				placeholder: 'Target wallet ID',
+				description: 'Wallet ID to move accounts to',
 			},
 			{
 				displayName: 'Accounts to Move',
@@ -3182,13 +3333,6 @@ export class Nano implements INodeType {
 				placeholder: 'Add Option',
 				default: {},
 				options: [
-					{
-						displayName: 'Include Raw Values',
-						name: 'includeRaw',
-						type: 'boolean',
-						default: false,
-						description: 'Whether to include raw (non-human-readable) values in response',
-					},
 					{
 						displayName: 'Timeout (Ms)',
 						name: 'timeout',
@@ -3753,10 +3897,25 @@ export class Nano implements INodeType {
 
 					case 'accountMove': {
 						const sourceWallet = this.getNodeParameter('sourceWallet', i) as string;
+						const targetWallet = this.getNodeParameter('targetWallet', i) as string;
 						const accountsToMoveStr = this.getNodeParameter('accountsToMove', i) as string;
 						const accountsToMove = accountsToMoveStr.split(',').map((a) => a.trim());
 
-						const moved = await rpc.accountMove(walletId, sourceWallet, accountsToMove);
+						const wallet = sourceWallet ?? walletId;
+
+						for (const account of accountsToMove) {
+							if (!isValidNanoAddress(account)) {
+								throw new NodeOperationError(
+									this.getNode(),
+									`Invalid account address: ${account}`,
+									{ itemIndex: i },
+								);
+							}
+						}
+
+
+
+						const moved = await rpc.accountMove(wallet, targetWallet,  accountsToMove);
 
 						responseData = {
 							success: true,
@@ -4789,20 +4948,40 @@ export class Nano implements INodeType {
 
 					case 'createBlock': {
 						const blockType = this.getNodeParameter('blockType', i) as 'state' | 'send' | 'receive' | 'change';
-						const blockParamsStr = this.getNodeParameter('blockParams', i) as Record<string, string>;
 
-						// let blockParams;
-						// try {
-						//   blockParams = JSON.parse(blockParamsStr);
-						// } catch {
-						//   throw new NodeOperationError(
-						//     this.getNode(),
-						//     'Invalid block parameters JSON',
-						//     { itemIndex: i }
-						//   );
-						// }
+						const balance = this.getNodeParameter('balance', i, '') as string;
+						const representative = this.getNodeParameter('representative', i) as string;
+						const previous = this.getNodeParameter('previous', i) as string;
 
-						const block = await rpc.createBlock({ type: blockType, ...blockParamsStr });
+						const wallet = this.getNodeParameter('wallet', i, '') as string;
+						const account = this.getNodeParameter('createBlockAccount', i, '') as string;
+						const destination = this.getNodeParameter('destination', i, '') as string;
+						const source = this.getNodeParameter('source', i, '') as string;
+						const key = this.getNodeParameter('privateKey', i, '') as string;
+						const link = this.getNodeParameter('link', i, '') as string;
+
+						const workCreateBlock = this.getNodeParameter('workCreateBlock', i, '') as string;
+						const jsonBlock = this.getNodeParameter('jsonBlock', i, true) as boolean;
+						const workVersion = this.getNodeParameter('workVersion', i, '') as string;
+						const difficulty = this.getNodeParameter('difficulty', i, '') as string;
+
+
+						const block = await rpc.createBlock({
+							type: blockType,
+							json_block: jsonBlock,
+							balance,
+							representative: representative,
+							previous: previous,
+							wallet: wallet || undefined,
+							account: account || undefined,
+							key: key || undefined,
+							destination: destination || undefined,
+							source: source || undefined,
+							link: link || undefined,
+							work: workCreateBlock || undefined,
+							version: workVersion || undefined,
+							difficulty: difficulty || undefined,
+						});
 
 						responseData = {
 							success: true,
@@ -4814,6 +4993,7 @@ export class Nano implements INodeType {
 
 					case 'getBlockHash': {
 						const blockParamsStr = this.getNodeParameter('blockParams', i) as string;
+						const jsonBlock = this.getNodeParameter('jsonBlock', i, true) as boolean;
 
 						let blockParams;
 						try {
@@ -4824,7 +5004,7 @@ export class Nano implements INodeType {
 							});
 						}
 
-						const hash = await rpc.getBlockHash(blockParams);
+						const hash = await rpc.getBlockHash(blockParams, jsonBlock);
 
 						responseData = {
 							hash,
