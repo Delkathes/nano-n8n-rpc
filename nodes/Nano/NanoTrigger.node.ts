@@ -36,13 +36,14 @@ export interface NanoAdvancedOptions {
 export class NanoTrigger implements INodeType {
 	description: INodeTypeDescription = NanoTriggerDescription;
 
-	// Store for deduplication (limited size to prevent memory issues)
-	private static seenHashes = new Set<string>();
+	// Deduplication constants
+	private static readonly MAX_HASH_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
+	private static readonly CLEANUP_THRESHOLD = 1000; // Cleanup when exceeding this many entries
 
 	webhookMethods = {
 		default: {
 			async checkExists(this: IHookFunctions): Promise<boolean> {
-				return false; 
+				return false;
 			},
 
 			async create(this: IHookFunctions): Promise<boolean> {
@@ -50,8 +51,7 @@ export class NanoTrigger implements INodeType {
 			},
 
 			async delete(this: IHookFunctions): Promise<boolean> {
-				// Clean up the seenHashes set when webhook is deleted
-				NanoTrigger.seenHashes.clear();
+				// Static data is automatically cleaned up by n8n
 				return true;
 			},
 		},
@@ -79,8 +79,28 @@ export class NanoTrigger implements INodeType {
 		// Convert amount to Nano
         const amountNano = Number(rawToNano(bodyData.amount));
 
+		// Get workflow-scoped static data for deduplication
+		let seenHashes: Record<string, number> = {};
+		if (deduplicateHash) {
+			const staticData = this.getWorkflowStaticData('node');
+			if (!staticData.seenHashes) {
+				staticData.seenHashes = {};
+			}
+			seenHashes = staticData.seenHashes as Record<string, number>;
+
+			// Periodic cleanup of old entries
+			if (Object.keys(seenHashes).length > NanoTrigger.CLEANUP_THRESHOLD) {
+				const cutoff = Date.now() - NanoTrigger.MAX_HASH_AGE_MS;
+				for (const hash of Object.keys(seenHashes)) {
+					if (seenHashes[hash] < cutoff) {
+						delete seenHashes[hash];
+					}
+				}
+			}
+		}
+
 		// Apply filters
-		if (shouldFilterWebhook(bodyData, filterOptions, amountNano, NanoTrigger.seenHashes, deduplicateHash)) {
+		if (shouldFilterWebhook(bodyData, filterOptions, amountNano, seenHashes, deduplicateHash)) {
 			return { noWebhookResponse: true };
 		}
 
@@ -274,22 +294,18 @@ function buildWebhookResponse(
 
 /**
  * Validates if a block hash has been seen before (deduplication)
+ * Uses a Record with timestamps for automatic cleanup of old entries
  */
 export function isDuplicateHash(
 	hash: string,
-	seenHashes: Set<string>,
-	maxSize: number = 10000,
+	seenHashes: Record<string, number>,
 ): boolean {
-	// Simple memory management: clear set if it gets too large
-	if (seenHashes.size > maxSize) {
-		seenHashes.clear();
-	}
-
-	if (seenHashes.has(hash)) {
+	if (seenHashes[hash]) {
 		return true;
 	}
 
-	seenHashes.add(hash);
+	// Store hash with current timestamp
+	seenHashes[hash] = Date.now();
 	return false;
 }
 
@@ -369,7 +385,7 @@ export function shouldFilterWebhook(
 	bodyData: NanoCallbackPayload,
 	filterOptions: NanoFilterOptions,
 	amountNano: number | undefined,
-	seenHashes: Set<string>,
+	seenHashes: Record<string, number>,
 	deduplicateHash: boolean,
 ): boolean {
 	// Deduplication check
