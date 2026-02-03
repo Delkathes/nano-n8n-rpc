@@ -38,7 +38,8 @@
 			"dist/credentials/NanoApi.credentials.js"
 		],
 		"nodes": [
-			"dist/nodes/Nano/Nano.node.js"
+			"dist/nodes/Nano/NanoRPC.node.js",
+			"dist/nodes/Nano/NanoTrigger.node.js"
 		]
 	},
 	"devDependencies": {

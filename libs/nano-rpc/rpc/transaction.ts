@@ -11,7 +11,7 @@ import type {
   ReceivableExistsRPCResponse,
   SendRPCResponse,
   ReceiveRPCResponse,
-} from '../../types/rpc';
+} from '../../../types/rpc';
 
 /**
  * Publish a block to the network

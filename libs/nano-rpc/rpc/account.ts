@@ -18,7 +18,7 @@ import type {
   AccountHistoryOptions,
   AccountsBalancesOptions,
   AccountsReceivableOptions,
-} from '../../types/rpc';
+} from '../../../types/rpc';
 
 /**
  * Get account balance

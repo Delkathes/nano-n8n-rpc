@@ -6,6 +6,8 @@
  * They are designed for end-user consumption in n8n workflows.
  */
 
+import type { BlockContents } from "../rpc";
+
 // ============ Account Responses ============
 
 export interface BalanceResponse {
@@ -16,44 +18,43 @@ export interface BalanceResponse {
   pendingRaw: string;
   balanceFormatted: string;
   pendingFormatted: string;
-  [key: string]: unknown;
+  receivable: string;
+  receivableRaw: string;
 }
 
 export interface AccountInfoResponse {
+  frontier: string;
+  openBlock: string;
+  representativeBlock: string;
   account: string;
   balance: string;
   balanceRaw: string;
   blockCount: string;
-  representative: string;
-  weight: string;
-  pending: string;
-  pendingRaw: string;
-  [key: string]: unknown;
+  pending?: string;
+  pendingRaw?: string;
+  weight?: string;
+  representative?: string;
 }
 
 export interface AccountBlockCountResponse {
   account: string;
   blockCount: number;
-  [key: string]: unknown;
 }
 
 export interface AccountKeyResponse {
   account: string;
   publicKey: string;
-  [key: string]: unknown;
 }
 
 export interface AccountRepresentativeResponse {
   account: string;
   representative: string;
-  [key: string]: unknown;
 }
 
 export interface AccountWeightResponse {
   account: string;
   weight: string;
   weightFormatted: string;
-  [key: string]: unknown;
 }
 
 export interface HistoryTransaction {
@@ -62,50 +63,44 @@ export interface HistoryTransaction {
   amount: string;
   amountRaw: string;
   hash: string;
-  localTimestamp: string;
-  [key: string]: unknown;
+  localTimestamp?: string;
 }
 
 export interface HistoryResponse {
   account: string;
   history: HistoryTransaction[];
   previous?: string;
-  [key: string]: unknown;
 }
 
 export interface GetAccountsBalancesResponse {
   balances: Record<string, { balance: string; pending: string }>;
-  [key: string]: unknown;
 }
 
 export interface GetAccountFromPublicKeyResponse {
   publicKey: string;
   account: string;
-  [key: string]: unknown;
 }
 
 export interface GetAccountsFrontiersResponse {
   accounts: string[];
   frontiers: Record<string, string>;
-  [key: string]: unknown;
 }
 
 export interface GetAccountsReceivableResponse {
   accounts: string[];
-  receivable: Record<string, unknown>;
-  [key: string]: unknown;
+  receivable: {
+    blocks: Record<string, string | { amount: string; source: string }>;
+  }
 }
 
 export interface GetAccountsRepresentativesResponse {
   accounts: string[];
   representatives: Record<string, string>;
-  [key: string]: unknown;
 }
 
 export interface ValidateResponse {
   address: string;
   valid: boolean;
-  [key: string]: unknown;
 }
 
 // ============ Block Responses ============
@@ -114,48 +109,40 @@ export interface BlockInfoResponse {
   hash: string;
   amount?: string;
   balance?: string;
-  [key: string]: unknown;
 }
 
 export interface BlockAccountResponse {
   blockHash: string;
   account: string;
-  [key: string]: unknown;
 }
 
 export interface BlockCountResponse {
   count: string;
   unchecked: string;
-  [key: string]: unknown;
+  cemented: string;
 }
 
 export interface ConfirmBlockResponse {
   success: boolean;
   hash: string;
-  [key: string]: unknown;
 }
 
 export interface GetBlocksResponse {
   blocks: Record<string, unknown>;
-  [key: string]: unknown;
 }
 
 export interface GetBlocksInfoResponse {
   blocks: Record<string, unknown>;
-  [key: string]: unknown;
 }
 
 export interface CreateBlockResponse {
-  success: boolean;
   blockType: string;
-  block: Record<string, unknown>;
-  [key: string]: unknown;
+  block: BlockContents;
 }
 
 export interface GetBlockHashResponse {
   hash: string;
   block: Record<string, unknown>;
-  [key: string]: unknown;
 }
 
 // ============ Transaction Responses ============
@@ -168,7 +155,7 @@ export interface SendPaymentResponse {
   amountRaw: string;
   source: string;
   timestamp: string;
-  [key: string]: unknown;
+  id: string
 }
 
 export interface ReceiveResponse {
@@ -177,7 +164,6 @@ export interface ReceiveResponse {
   receivedBlockHash: string;
   originalBlockHash: string;
   timestamp: string;
-  [key: string]: unknown;
 }
 
 export interface PendingBlock {
@@ -185,33 +171,29 @@ export interface PendingBlock {
   amount: string;
   amountRaw: string;
   source: string;
-  [key: string]: unknown;
 }
 
 export interface PendingResponse {
   account: string;
   pendingCount: number;
   pendingBlocks: PendingBlock[];
-  [key: string]: unknown;
 }
 
 export interface ReceivableResponse {
   account: string;
   receivable: Record<string, unknown>;
-  [key: string]: unknown;
 }
 
 export interface ReceivableExistsResponse {
   hash: string;
   exists: boolean;
-  [key: string]: unknown;
 }
 
 export interface ProcessBlockResponse {
   success: boolean;
   hash: string;
   subtype: string;
-  [key: string]: unknown;
+  async: boolean
 }
 
 export interface EpochUpgradeResponse {
@@ -219,7 +201,6 @@ export interface EpochUpgradeResponse {
   epoch: number;
   count: number;
   result: unknown;
-  [key: string]: unknown;
 }
 
 // ============ Wallet Responses ============
@@ -229,108 +210,91 @@ export interface CreateAccountResponse {
   account: string;
   wallet: string;
   timestamp: string;
-  [key: string]: unknown;
+  workGenerated: boolean
 }
 
 export interface ListAccountsResponse {
   wallet: string;
   accountCount: number;
   accounts: string[];
-  [key: string]: unknown;
 }
 
 export interface AccountMoveResponse {
   success: boolean;
   moved: number;
-  [key: string]: unknown;
 }
 
 export interface AccountRemoveResponse {
   success: boolean;
   removed: boolean;
-  [key: string]: unknown;
 }
 
 export interface AccountRepresentativeSetResponse {
   success: boolean;
   block: string;
-  [key: string]: unknown;
 }
 
 export interface AccountsCreateResponse {
   success: boolean;
   accounts: string[];
-  [key: string]: unknown;
 }
 
 export interface PasswordChangeResponse {
   success: boolean;
   changed: boolean;
-  [key: string]: unknown;
 }
 
 export interface PasswordEnterResponse {
   success: boolean;
   valid: boolean;
-  [key: string]: unknown;
 }
 
 export interface PasswordValidResponse {
   valid: boolean;
-  [key: string]: unknown;
 }
 
 export interface ReceiveMinimumResponse {
   amount: string;
   amountFormatted: string;
-  [key: string]: unknown;
 }
 
 export interface ReceiveMinimumSetResponse {
   success: boolean;
-  [key: string]: unknown;
 }
 
 export interface SearchReceivableResponse {
   success: boolean;
   started: boolean;
-  [key: string]: unknown;
 }
 
 export interface SearchReceivableAllResponse {
   success: boolean;
-  [key: string]: unknown;
 }
 
 export interface WalletAddResponse {
   success: boolean;
   account: string;
-  [key: string]: unknown;
 }
 
 export interface WalletAddWatchResponse {
   success: boolean;
-  [key: string]: unknown;
 }
 
 export interface WalletBalancesResponse {
   wallet: string;
   balances: Record<string, { balance: string; pending: string }>;
-  [key: string]: unknown;
 }
 
 export interface WalletChangeSeedResponse {
   success: boolean;
   lastRestoredAccount: string;
   restoredCount: number;
-  [key: string]: unknown;
 }
 
 export interface WalletContainsResponse {
   wallet: string;
   account: string;
   exists: boolean;
-  [key: string]: unknown;
 }
 
 export interface WalletCreateResponse {
@@ -338,25 +302,21 @@ export interface WalletCreateResponse {
   wallet: string;
   lastRestoredAccount?: string;
   restoredCount?: number;
-  [key: string]: unknown;
 }
 
 export interface WalletDestroyResponse {
   success: boolean;
   destroyed: boolean;
-  [key: string]: unknown;
 }
 
 export interface WalletExportResponse {
   wallet: string;
   json: string;
-  [key: string]: unknown;
 }
 
 export interface WalletFrontiersResponse {
   wallet: string;
   frontiers: Record<string, string>;
-  [key: string]: unknown;
 }
 
 export interface WalletHistoryResponse {
@@ -369,84 +329,74 @@ export interface WalletHistoryResponse {
     hash: string;
     local_timestamp: string;
   }>;
-  [key: string]: unknown;
 }
 
 export interface WalletInfoResponse {
   wallet: string;
   balance: string;
   pending: string;
+  receivable: string;
   accountsCount: number;
+  accountsBlockCount: number;
+  accountsCementedBlockCount: number;
   adhocCount: number;
   deterministicCount: number;
   deterministicIndex: number;
-  [key: string]: unknown;
 }
 
 export interface WalletLedgerResponse {
   wallet: string;
   accounts: Record<string, unknown>;
-  [key: string]: unknown;
 }
 
 export interface WalletLockResponse {
   success: boolean;
   locked: boolean;
-  [key: string]: unknown;
 }
 
 export interface WalletLockedResponse {
   wallet: string;
   locked: boolean;
-  [key: string]: unknown;
 }
 
 export interface WalletPendingResponse {
   wallet: string;
   blocks: Record<string, unknown>;
-  [key: string]: unknown;
 }
 
 export interface WalletReceivableResponse {
   wallet: string;
   blocks: Record<string, unknown>;
-  [key: string]: unknown;
 }
 
 export interface WalletRepresentativeResponse {
   wallet: string;
   representative: string;
-  [key: string]: unknown;
 }
 
 export interface WalletRepresentativeSetResponse {
   success: boolean;
   set: boolean;
-  [key: string]: unknown;
 }
 
 export interface WalletRepublishResponse {
   success: boolean;
   blocks: string[];
-  [key: string]: unknown;
 }
 
 export interface WalletWorkGetResponse {
   wallet: string;
   works: Record<string, string>;
-  [key: string]: unknown;
 }
 
 export interface WorkGetResponse {
   wallet: string;
   account: string;
   work: string;
-  [key: string]: unknown;
 }
 
 export interface WorkSetResponse {
   success: boolean;
-  [key: string]: unknown;
 }
 
 // ============ Network Responses ============
@@ -454,39 +404,37 @@ export interface WorkSetResponse {
 export interface GetAvailableSupplyResponse {
   availableSupply: string;
   availableSupplyRaw: string;
-  [key: string]: unknown;
 }
 
 export interface KeepaliveResponse {
   success: boolean;
   address: string;
   port: number;
-  [key: string]: unknown;
 }
 
 export interface GetNodeIdResponse {
-  nodeId: string;
-  [key: string]: unknown;
+  nodeId: {
+    private: string;
+    public: string;
+    as_account: string;
+    node_id: string;
+  };
 }
 
 export interface GetPeersResponse {
   peers: Record<string, unknown>;
-  [key: string]: unknown;
 }
 
 export interface PopulateBacklogResponse {
   success: boolean;
-  [key: string]: unknown;
 }
 
 export interface GetRepresentativesResponse {
   representatives: Record<string, string>;
-  [key: string]: unknown;
 }
 
 export interface RepresentativesOnlineResponse {
   representatives: Record<string, unknown>;
-  [key: string]: unknown;
 }
 
 export interface RepublishResponse {
@@ -496,7 +444,6 @@ export interface RepublishResponse {
   sources: number;
   destinations: number;
   result: unknown;
-  [key: string]: unknown;
 }
 
 export interface GetTelemetryResponse {
@@ -516,7 +463,6 @@ export interface GetTelemetryResponse {
   maker?: string;
   timestamp?: string;
   active_difficulty?: string;
-  [key: string]: unknown;
 }
 
 export interface VersionResponse {
@@ -528,12 +474,10 @@ export interface VersionResponse {
   network: string;
   network_identifier: string;
   build_info: string;
-  [key: string]: unknown;
 }
 
 export interface GetUptimeResponse {
   seconds: number;
-  [key: string]: unknown;
 }
 
 // ============ Ledger Responses ============
@@ -541,52 +485,62 @@ export interface GetUptimeResponse {
 export interface GetChainResponse {
   startingBlock: string;
   chain: string[];
-  [key: string]: unknown;
 }
 
 export interface GetFrontiersResponse {
   startingAccount: string;
   frontiers: Record<string, string>;
-  [key: string]: unknown;
 }
 
 export interface GetFrontierCountResponse {
   count: string;
-  [key: string]: unknown;
 }
 
 export interface GetLedgerResponse {
   startingAccount: string;
   accounts: Record<string, unknown>;
-  [key: string]: unknown;
 }
 
 export interface GetSuccessorsResponse {
   startingBlock: string;
   successors: string[];
-  [key: string]: unknown;
 }
 
 export interface GetUnopenedResponse {
   accounts: Record<string, unknown>;
-  [key: string]: unknown;
 }
 
 // ============ Confirmation Responses ============
 
 export interface GetConfirmationActiveResponse {
-  confirmations: Record<string, unknown>;
-  [key: string]: unknown;
+  confirmations: {
+    confirmations: string[];
+    unconfirmed: string;
+    confirmed: string;
+  }
 }
 
 export interface GetConfirmationHeightCurrentlyProcessingResponse {
   processing: Record<string, unknown>;
-  [key: string]: unknown;
 }
 
 export interface GetConfirmationHistoryResponse {
-  history: Record<string, unknown>;
-  [key: string]: unknown;
+  history: {
+    confirmation_stats: {
+      count: string;
+      average: string;
+    };
+    confirmations: Array<{
+      hash: string;
+      duration: string;
+      time: string;
+      tally: string;
+      final: string;
+      blocks: string;
+      voters: string;
+      request_count: string;
+    }>;
+  }
 }
 
 export interface GetConfirmationInfoResponse {
@@ -596,17 +550,30 @@ export interface GetConfirmationInfoResponse {
   last_winner?: string;
   total_tally?: string;
   blocks?: Record<string, unknown>;
-  [key: string]: unknown;
 }
 
 export interface GetConfirmationQuorumResponse {
-  quorum: Record<string, unknown>;
-  [key: string]: unknown;
+  quorum: {
+    quorum_delta: string;
+    online_weight_quorum_percent: string;
+    online_weight_minimum: string;
+    online_stake_total: string;
+    peers_stake_total: string;
+    trended_stake_total: string;
+  }
 }
 
 export interface GetElectionStatisticsResponse {
-  statistics: Record<string, unknown>;
-  [key: string]: unknown;
+  statistics: {
+    normal: string;
+    priority: string;
+    hinted: string;
+    optimistic: string;
+    total: string;
+    aec_utilization_percentage: string;
+    max_election_age: string;
+    average_election_age: string;
+  }
 }
 
 // ============ Work Responses ============
@@ -620,38 +587,35 @@ export interface GenerateWorkResponse {
   difficulty: string;
   /** Multiplier from base difficulty (v19.0+) */
   multiplier: string;
-  [key: string]: unknown;
 }
 
 export interface ValidateWorkResponse {
   work: string;
   hash: string;
-  valid: boolean;
+  valid?: boolean;
+  validAll: boolean;
+  validReceive: boolean;
   difficulty: string;
-  [key: string]: unknown;
+  multiplier: number;
 }
 
 export interface CancelWorkResponse {
   success: boolean;
   hash: string;
-  [key: string]: unknown;
 }
 
 export interface AddWorkPeerResponse {
   success: boolean;
   address: string;
   port: number;
-  [key: string]: unknown;
 }
 
 export interface GetWorkPeersResponse {
   workPeers: string[];
-  [key: string]: unknown;
 }
 
 export interface ClearWorkPeersResponse {
   success: boolean;
-  [key: string]: unknown;
 }
 
 // ============ Key Responses ============
@@ -661,13 +625,10 @@ export interface CreateKeyResponse {
   private: string;
   public: string;
   account: string;
-  [key: string]: unknown;
 }
 
 export interface SignResponse {
-  hash: string;
   signature: string;
-  [key: string]: unknown;
 }
 
 export interface ExpandKeyResponse {
@@ -675,7 +636,6 @@ export interface ExpandKeyResponse {
   private: string;
   public: string;
   account: string;
-  [key: string]: unknown;
 }
 
 export interface GetDeterministicKeyResponse {
@@ -684,7 +644,6 @@ export interface GetDeterministicKeyResponse {
   private: string;
   public: string;
   account: string;
-  [key: string]: unknown;
 }
 
 // ============ Representative Responses ============
@@ -693,13 +652,11 @@ export interface DelegatorsResponse {
   account: string;
   delegators: Record<string, string>;
   delegatorCount: number;
-  [key: string]: unknown;
 }
 
 export interface DelegatorsCountResponse {
   account: string;
   delegatorCount: number;
-  [key: string]: unknown;
 }
 
 // ============ Debug/Admin Responses ============
@@ -708,76 +665,106 @@ export interface BootstrapResponse {
   success: boolean;
   address: string;
   port: number;
-  [key: string]: unknown;
 }
 
 export interface BootstrapAnyResponse {
   success: boolean;
-  [key: string]: unknown;
 }
 
 export interface BootstrapLazyResponse {
   success: boolean;
   hash: string;
   force: boolean;
-  [key: string]: unknown;
 }
 
 export interface GetBootstrapPrioritiesResponse {
-  priorities: Record<string, unknown>;
-  [key: string]: unknown;
+  priorities: {
+    account: string;
+    priority: string;
+  }[];
 }
 
 export interface ResetBootstrapResponse {
   success: boolean;
-  [key: string]: unknown;
 }
 
 export interface GetBootstrapStatusResponse {
-  status: Record<string, unknown>;
-  [key: string]: unknown;
+  status: {
+    bootstrap_threads: string;
+    running_attempts_count: string;
+    total_attempts_count: string;
+    connections: {
+      clients: string;
+      connections: string;
+      idle: string;
+      target_connections: string;
+      pulls: string;
+    };
+    attempts: {
+      id: string;
+      mode: string;
+      started: string;
+      pulling: string;
+      total_blocks: string;
+      requeued_pulls: string;
+      frontier_pulls: string;
+      account_count: string;
+    }[];
+  }
 }
 
 export interface GetDatabaseTxnTrackerResponse {
-  tracker: Record<string, unknown>;
-  [key: string]: unknown;
+  tracker: {
+    txn_tracking: {
+      thread: string;
+      time_held_open: string;
+      write: string;
+      stacktrace?: string[];
+    }[];
+  }
 }
 
 export interface GetStatsResponse {
   type: string;
-  [key: string]: unknown;
+  created: string;
+  entries: {
+    time: string;
+    type: string;
+    detail: string;
+    dir: string;
+    value: string;
+  }[];
 }
 
 export interface ClearStatsResponse {
   success: boolean;
-  [key: string]: unknown;
 }
 
 export interface StopNodeResponse {
   success: boolean;
-  [key: string]: unknown;
 }
 
 export interface GetUncheckedResponse {
   count: number;
   blocks: Record<string, unknown>;
-  [key: string]: unknown;
 }
 
 export interface ClearUncheckedResponse {
   success: boolean;
-  [key: string]: unknown;
 }
 
 export interface GetUncheckedBlockResponse {
   hash: string;
-  block: Record<string, unknown>;
-  [key: string]: unknown;
+  block: BlockContents
 }
 
 export interface GetUncheckedKeysResponse {
-  keys: Record<string, unknown>;
-  [key: string]: unknown;
+  keys: {
+      key: string;
+      hash: string;
+      modified_timestamp: string;
+      contents: BlockContents;
+    }[];
 }
 
 // ============ Conversion Responses ============
@@ -785,13 +772,11 @@ export interface GetUncheckedKeysResponse {
 export interface NanoToRawRPCResponse {
   nano: string;
   raw: string;
-  [key: string]: unknown;
 }
 
 export interface RawToNanoRPCResponse {
   raw: string;
   nano: string;
-  [key: string]: unknown;
 }
 
 // ============ Union Type ============

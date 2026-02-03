@@ -10,7 +10,7 @@ import type {
   FrontiersRPCResponse,
   FrontierCountRPCResponse,
   UnopenedRPCResponse,
-} from '../../types/rpc';
+} from '../../../types/rpc';
 
 /**
  * Get a consecutive sequence of block hashes in the account chain
@@ -52,9 +52,9 @@ export async function getFrontiers(
 /**
  * Get the total frontier block count
  */
-export async function getFrontierCount(context: IExecuteFunctions, config: INanoRPCConfig): Promise<number> {
+export async function getFrontierCount(context: IExecuteFunctions, config: INanoRPCConfig): Promise<string> {
   const response = await nanoRPCCall<FrontierCountRPCResponse>(context, config, 'frontier_count');
-  return parseInt(response.count);
+  return response.count;
 }
 
 /**

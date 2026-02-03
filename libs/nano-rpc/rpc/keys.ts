@@ -6,7 +6,7 @@ import type {
   SignOptions,
   SignRPCResponse,
   DeterministicKeyRPCResponse,
-} from '../../types/rpc';
+} from '../../../types/rpc';
 
 /**
  * Derive deterministic keypair from seed based on index

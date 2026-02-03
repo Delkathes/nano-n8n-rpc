@@ -1,8 +1,8 @@
 import type { IExecuteFunctions, IHttpRequestMethods } from 'n8n-workflow';
-import type { INanoRPCConfig, INanoRPCResponse } from '../../types/rpc';
+import type { INanoRPCConfig, INanoRPCResponse } from '../../../types/rpc';
 
 // Re-export types for convenience from core
-export type { INanoRPCConfig, INanoRPCResponse } from '../../types/rpc';
+export type { INanoRPCConfig, INanoRPCResponse } from '../../../types/rpc';
 
 /**
  * Make RPC call to Nano node using n8n's HTTP helper

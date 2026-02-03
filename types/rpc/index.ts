@@ -8,7 +8,6 @@
 
 // Common/shared types
 export type {
-  StateBlock,
   BlockSubtype,
   BlockContents,
   CreateBlockParams,

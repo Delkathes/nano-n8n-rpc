@@ -14,7 +14,7 @@ import type {
   UptimeRPCResponse,
   RepresentativesRPCResponse,
   RepublishRPCResponse,
-} from '../../types/rpc';
+} from '../../../types/rpc';
 
 /**
  * Get the total available supply of Nano

@@ -13,7 +13,7 @@ import type {
   DatabaseTxnTrackerOptions,
   BootstrapPrioritiesRPCResponse,
   DatabaseTxnTrackerRPCResponse,
-} from '../../types/rpc';
+} from '../../../types/rpc';
 
 /**
  * Initialize bootstrap to a specific IP

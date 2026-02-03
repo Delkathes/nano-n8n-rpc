@@ -60,7 +60,7 @@ export interface BootstrapStatusRPCResponse {
     target_connections: string;
     pulls: string;
   };
-  attempts: Array<{
+  attempts: {
     id: string;
     mode: string;
     started: string;
@@ -69,20 +69,20 @@ export interface BootstrapStatusRPCResponse {
     requeued_pulls: string;
     frontier_pulls: string;
     account_count: string;
-  }>;
+  }[];
 }
 
 /** Raw RPC response from stats */
 export interface StatsRPCResponse {
   type: string;
   created: string;
-  entries: Array<{
+  entries: {
     time: string;
     type: string;
     detail: string;
     dir: string;
     value: string;
-  }>;
+  }[];
 }
 
 /** Raw RPC response from unchecked */
@@ -92,30 +92,30 @@ export interface UncheckedRPCResponse {
 
 /** Raw RPC response from unchecked_keys */
 export interface UncheckedKeysRPCResponse {
-  unchecked: Array<{
+  unchecked: {
     key: string;
     hash: string;
     modified_timestamp: string;
     contents: BlockContents;
-  }>;
+  }[];
 }
 
 /** Response from bootstrap_priorities */
 export interface BootstrapPrioritiesRPCResponse {
-  priorities: Array<{
+  priorities: {
     account: string;
     priority: string;
-  }>;
+  }[];
 }
 
 /** Response from database_txn_tracker */
 export interface DatabaseTxnTrackerRPCResponse {
-  txn_tracking: Array<{
+  txn_tracking: {
     thread: string;
     time_held_open: string;
     write: string;
     stacktrace?: string[];
-  }>;
+  }[];
 }
 
 // ============ Options Types ============

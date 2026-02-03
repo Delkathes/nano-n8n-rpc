@@ -1,4 +1,4 @@
-import { parseDecimal, shiftedBy, toFixed } from './bigint-helpers';
+import { parseDecimal, shiftedBy, toFixed } from './bigint';
 
 export type NanoUnit = 'RAW' | 'NANO' | 'MRAI' | 'KRAI' | 'RAI';
 

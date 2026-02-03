@@ -5,7 +5,7 @@ import type {
   GetDelegatorsOptions,
   DelegatorsRPCResponse,
   DelegatorsCountRPCResponse,
-} from '../../types/rpc';
+} from '../../../types/rpc';
 
 /**
  * Get delegators (accounts delegating) to a representative

@@ -41,7 +41,7 @@ import type {
   WalletWorkGetRPCResponse,
   WorkGetRPCResponse,
   WorkSetRPCResponse,
-} from '../../types/rpc';
+} from '../../../types/rpc';
 
 /**
  * Create new account in wallet

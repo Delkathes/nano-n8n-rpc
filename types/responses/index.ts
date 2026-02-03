@@ -1,6 +1,6 @@
 /**
  * Node Response Types - Central export point
- * 
+ *
  * These types represent the transformed/formatted responses
  * returned by the n8n Nano node.
  */

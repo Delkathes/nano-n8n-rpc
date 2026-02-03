@@ -13,7 +13,7 @@ import type {
   BlockCreateResponse,
   BlocksInfoOptions,
   BlocksInfoResponse,
-} from '../../types/rpc';
+} from '../../../types/rpc';
 
 /**
  * Get the account that owns a block

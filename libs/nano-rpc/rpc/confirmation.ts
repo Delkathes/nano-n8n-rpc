@@ -10,7 +10,7 @@ import type {
   ConfirmationActiveOptions,
   ConfirmationInfoOptions,
   ConfirmationQuorumOptions,
-} from '../../types/rpc';
+} from '../../../types/rpc';
 
 /**
  * Get currently active elections

@@ -3,20 +3,6 @@
  */
 
 // ============ Block Types ============
-
-/** State block structure (current standard) */
-export interface StateBlock {
-  type: 'state';
-  account: string;
-  previous: string;
-  representative: string;
-  balance: string;
-  link: string;
-  link_as_account?: string;
-  signature: string;
-  work: string;
-}
-
 /** Block subtype for state blocks */
 export type BlockSubtype = 'send' | 'receive' | 'open' | 'change' | 'epoch';
 
@@ -28,7 +14,7 @@ export interface BlockContents {
   representative: string;
   balance: string;
   link: string;
-  link_as_account?: string;
+  link_as_account: string;
   signature: string;
   work: string;
 }

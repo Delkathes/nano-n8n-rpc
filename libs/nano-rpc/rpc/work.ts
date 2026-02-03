@@ -7,7 +7,7 @@ import type {
   WorkValidateOptions,
   WorkValidateResponse,
   WorkPeersRPCResponse,
-} from '../../types/rpc';
+} from '../../../types/rpc';
 
 /**
  * Cancel work generation

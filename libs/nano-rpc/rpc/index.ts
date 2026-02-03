@@ -6,7 +6,6 @@ export type {
   BlockContents,
   BlockSubtype,
   CreateBlockParams,
-  StateBlock,
   // Account types
   AccountInfoRPCResponse,
   AccountHistoryRPCResponse,
@@ -79,7 +78,7 @@ export type {
   DatabaseTxnTrackerOptions,
   // Representative types
   GetDelegatorsOptions,
-} from '../../types/rpc';
+} from '../../../types/rpc';
 
 // Re-export core utilities
 export { nanoRPCCall } from './core';
