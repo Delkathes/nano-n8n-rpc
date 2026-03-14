@@ -18,17 +18,23 @@ import type {
 /**
  * Get the account that owns a block
  */
-export async function getBlockAccount(context: IExecuteFunctions, config: INanoRPCConfig, hash: string): Promise<string> {
-  const response = await nanoRPCCall<BlockAccountRPCResponse>(context, config, 'block_account', { hash });
-  return response.account;
+export async function getBlockAccount(
+  context: IExecuteFunctions,
+  config: INanoRPCConfig,
+  hash: string,
+): Promise<BlockAccountRPCResponse> {
+  return await nanoRPCCall<BlockAccountRPCResponse>(context, config, 'block_account', { hash });
 }
 
 /**
  * Request confirmation for a block
  */
-export async function confirmBlock(context: IExecuteFunctions, config: INanoRPCConfig, hash: string): Promise<boolean> {
-  const response = await nanoRPCCall<BlockConfirmRPCResponse>(context, config, 'block_confirm', { hash });
-  return response.started === '1';
+export async function confirmBlock(
+  context: IExecuteFunctions,
+  config: INanoRPCConfig,
+  hash: string,
+): Promise<BlockConfirmRPCResponse> {
+  return await nanoRPCCall<BlockConfirmRPCResponse>(context, config, 'block_confirm', { hash });
 }
 
 /**
@@ -76,13 +82,17 @@ export async function createBlock(
 /**
  * Calculate hash for a block
  */
-export async function getBlockHash(context: IExecuteFunctions, config: INanoRPCConfig, block: BlockContents, jsonBlock: boolean = true): Promise<string> {
+export async function getBlockHash(
+  context: IExecuteFunctions,
+  config: INanoRPCConfig,
+  block: BlockContents,
+  jsonBlock: boolean = true,
+): Promise<BlockHashRPCResponse> {
   const params: Record<string, BlockContents | boolean> = {
     block,
     json_block: jsonBlock,
   };
-  const response = await nanoRPCCall<BlockHashRPCResponse>(context, config, 'block_hash', params);
-  return response.hash;
+  return await nanoRPCCall<BlockHashRPCResponse>(context, config, 'block_hash', params);
 }
 
 /**
@@ -108,9 +118,12 @@ export async function getBlockInfo(
 /**
  * Get multiple blocks by their hashes
  */
-export async function getBlocks(context: IExecuteFunctions, config: INanoRPCConfig, hashes: string[]): Promise<Record<string, BlockContents | string>> {
-  const response = await nanoRPCCall<BlocksRPCResponse>(context, config, 'blocks', { hashes, json_block: true });
-  return response.blocks;
+export async function getBlocks(
+  context: IExecuteFunctions,
+  config: INanoRPCConfig,
+  hashes: string[],
+): Promise<BlocksRPCResponse> {
+  return await nanoRPCCall<BlocksRPCResponse>(context, config, 'blocks', { hashes, json_block: true });
 }
 
 /**

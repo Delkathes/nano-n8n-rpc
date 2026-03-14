@@ -132,8 +132,8 @@ export type {
   GetUncheckedBlockResponse,
   GetUncheckedKeysResponse,
   // Conversion responses
-  NanoToRawRPCResponse,
-  RawToNanoRPCResponse,
+  NanoToRawResponse as NanoToRawRPCResponse,
+  RawToNanoResponse as RawToNanoRPCResponse,
   // Union type
   NanoOperationResponse,
 } from './node-responses';

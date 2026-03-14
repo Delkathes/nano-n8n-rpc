@@ -36,6 +36,11 @@ export interface AccountWeightRPCResponse {
   weight: string;
 }
 
+/** Response from accounts_balances */
+export interface AccountsBalancesRPCResponse {
+  balances: Record<string, { balance: string; pending: string; receivable: string }>;
+}
+
 /** Response from accounts_frontiers */
 export interface AccountsFrontiersRPCResponse {
   frontiers: Record<string, string>;

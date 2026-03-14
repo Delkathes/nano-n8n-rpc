@@ -1045,7 +1045,7 @@ export const NanoRPCDescription: INodeTypeDescription = {
             },
             default: '',
             placeholder: 'Wallet ID',
-            description: 'Manually specify the wallet ID to send fund from (optional), default to credential wallet ',
+            description: 'Manually specify the wallet ID to send fund from (optional), default to credential wallet',
         },
         {
             displayName: 'Destination Address',
@@ -1442,7 +1442,7 @@ export const NanoRPCDescription: INodeTypeDescription = {
             },
             default: '',
             placeholder: 'Wallet ID',
-            description: 'Manually specify the wallet ID to receive funds to (optional), default to credential wallet ',
+            description: 'Manually specify the wallet ID to receive funds to (optional), default to credential wallet',
         },
         {
             displayName: 'Receiving Account',
@@ -1927,7 +1927,7 @@ export const NanoRPCDescription: INodeTypeDescription = {
             },
             default: '',
             placeholder: 'Wallet ID',
-            description: 'Manually specify the wallet ID you sign from (optional), default to credential wallet ',
+            description: 'Manually specify the wallet ID you sign from (optional), default to credential wallet',
         },
         {
             displayName: 'Sign Method',
@@ -2446,7 +2446,7 @@ export const NanoRPCDescription: INodeTypeDescription = {
             },
             default: '',
             placeholder: '15000000000000000000000',
-            description: "Final balance for account after block creation, formatted in 'raw' units using a decimal integer. If balance is less than previous, block is considered as send subtype!",
+            description: 'Final balance for account after block creation, formatted in \'raw\' units using a decimal integer. If balance is less than previous, block is considered as send subtype!.',
         },
         {
             displayName: 'Wallet',
@@ -2459,7 +2459,7 @@ export const NanoRPCDescription: INodeTypeDescription = {
             },
             default: '',
             placeholder: 'Wallet ID',
-            description: 'The wallet ID that the account the block is being created for is in.',
+            description: 'The wallet ID that the account the block is being created for is in',
         },
         {
             displayName: 'Account Address',
@@ -2472,7 +2472,7 @@ export const NanoRPCDescription: INodeTypeDescription = {
             },
             default: '',
             placeholder: 'nano_1abc...',
-            description: 'The account the block is being created for.',
+            description: 'The account the block is being created for',
         },
         {
             displayName: 'Private Key',
@@ -2488,7 +2488,7 @@ export const NanoRPCDescription: INodeTypeDescription = {
             },
             default: '',
             placeholder: '64-character hex string',
-            description: 'Instead of using "wallet" & "account" parameters, you can directly pass in a private key.',
+            description: 'Instead of using "wallet" & "account" parameters, you can directly pass in a private key',
         },
         {
             displayName: 'Source',
@@ -2501,7 +2501,7 @@ export const NanoRPCDescription: INodeTypeDescription = {
             },
             default: '',
             placeholder: 'Block hash',
-            description: 'The block hash of the source of funds for this receive block (the send block that this receive block will pocket).',
+            description: 'The block hash of the source of funds for this receive block (the send block that this receive block will pocket)',
         },
         {
             displayName: 'Destination Address',
@@ -2514,7 +2514,7 @@ export const NanoRPCDescription: INodeTypeDescription = {
             },
             default: '',
             placeholder: 'nano_1abc...',
-            description: 'The account that the sent funds should be accessible to.',
+            description: 'The account that the sent funds should be accessible to',
         },
         {
             displayName: 'Link',
@@ -2541,7 +2541,7 @@ export const NanoRPCDescription: INodeTypeDescription = {
             },
             default: '',
             placeholder: 'nano_1abc...',
-            description: 'The account that block account will use as its representative.',
+            description: 'The account that block account will use as its representative',
         },
         {
             displayName: 'Previous',
@@ -2555,7 +2555,7 @@ export const NanoRPCDescription: INodeTypeDescription = {
             },
             default: '',
             placeholder: 'Block hash',
-            description: `The block hash of the previous block on this account's block chain ("0" for first block).`,
+            description: 'The block hash of the previous block on this account\'s block chain ("0" for first block)',
         },
         {
             displayName: 'Block Parameters',
@@ -3356,7 +3356,7 @@ export const NanoRPCDescription: INodeTypeDescription = {
             },
             default: '',
             placeholder: 'Wallet ID',
-            description: 'Manually specify the wallet ID (optional), default to credential wallet ',
+            description: 'Manually specify the wallet ID (optional), default to credential wallet',
         },
         {
             displayName: 'Wallet (Manual)',

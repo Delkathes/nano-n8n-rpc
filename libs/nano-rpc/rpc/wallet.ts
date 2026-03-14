@@ -51,7 +51,7 @@ export async function createAccount(
   config: INanoRPCConfig,
   wallet: string,
   options: CreateAccountOptions = {}
-): Promise<string> {
+): Promise<AccountCreateRPCResponse> {
   const params: Record<string, unknown> = { wallet };
 
   // Add index if specified (v18.0+)
@@ -64,16 +64,18 @@ export async function createAccount(
     params.work = false;
   }
 
-  const response = await nanoRPCCall<AccountCreateRPCResponse>(context, config, 'account_create', params);
-  return response.account;
+  return await nanoRPCCall<AccountCreateRPCResponse>(context, config, 'account_create', params);
 }
 
 /**
  * List accounts in wallet
  */
-export async function listAccounts(context: IExecuteFunctions, config: INanoRPCConfig, wallet: string): Promise<string[]> {
-  const response = await nanoRPCCall<AccountListRPCResponse>(context, config, 'account_list', { wallet });
-  return response.accounts;
+export async function listAccounts(
+  context: IExecuteFunctions,
+  config: INanoRPCConfig,
+  wallet: string,
+): Promise<AccountListRPCResponse> {
+  return await nanoRPCCall<AccountListRPCResponse>(context, config, 'account_list', { wallet });
 }
 
 /**
@@ -85,9 +87,8 @@ export async function accountMove(
   source: string,
   wallet: string,
   accounts: string[]
-): Promise<number> {
-  const response = await nanoRPCCall<AccountMoveRPCResponse>(context, config, 'account_move', { wallet, source, accounts });
-  return parseInt(response.moved);
+): Promise<AccountMoveRPCResponse> {
+  return await nanoRPCCall<AccountMoveRPCResponse>(context, config, 'account_move', { wallet, source, accounts });
 }
 
 /**
@@ -98,9 +99,8 @@ export async function accountRemove(
   config: INanoRPCConfig,
   wallet: string,
   account: string
-): Promise<boolean> {
-  const response = await nanoRPCCall<AccountRemoveRPCResponse>(context, config, 'account_remove', { wallet, account });
-  return response.removed === '1';
+): Promise<AccountRemoveRPCResponse> {
+  return await nanoRPCCall<AccountRemoveRPCResponse>(context, config, 'account_remove', { wallet, account });
 }
 
 /**
@@ -113,7 +113,7 @@ export async function accountRepresentativeSet(
   account: string,
   representative: string,
   options: AccountRepresentativeSetOptions = {}
-): Promise<string> {
+): Promise<AccountRepresentativeSetRPCResponse> {
   const params: Record<string, unknown> = {
     wallet,
     account,
@@ -125,8 +125,7 @@ export async function accountRepresentativeSet(
     params.work = options.work;
   }
 
-  const response = await nanoRPCCall<AccountRepresentativeSetRPCResponse>(context, config, 'account_representative_set', params);
-  return response.block;
+  return await nanoRPCCall<AccountRepresentativeSetRPCResponse>(context, config, 'account_representative_set', params);
 }
 
 /**
@@ -138,7 +137,7 @@ export async function accountsCreate(
   wallet: string,
   count: number,
   options: AccountsCreateOptions = {}
-): Promise<string[]> {
+): Promise<AccountsCreateRPCResponse> {
   const params: Record<string, unknown> = { wallet, count };
 
   // Only send work=true when explicitly enabled (default is false in v11.2+)
@@ -146,8 +145,7 @@ export async function accountsCreate(
     params.work = true;
   }
 
-  const response = await nanoRPCCall<AccountsCreateRPCResponse>(context, config, 'accounts_create', params);
-  return response.accounts;
+  return await nanoRPCCall<AccountsCreateRPCResponse>(context, config, 'accounts_create', params);
 }
 
 /**
@@ -158,9 +156,8 @@ export async function passwordChange(
   config: INanoRPCConfig,
   wallet: string,
   password: string
-): Promise<boolean> {
-  const response = await nanoRPCCall<PasswordChangeRPCResponse>(context, config, 'password_change', { wallet, password });
-  return response.changed === '1';
+): Promise<PasswordChangeRPCResponse> {
+  return await nanoRPCCall<PasswordChangeRPCResponse>(context, config, 'password_change', { wallet, password });
 }
 
 /**
@@ -171,9 +168,8 @@ export async function passwordEnter(
   config: INanoRPCConfig,
   wallet: string,
   password: string
-): Promise<boolean> {
-  const response = await nanoRPCCall<PasswordEnterRPCResponse>(context, config, 'password_enter', { wallet, password });
-  return response.valid === '1';
+): Promise<PasswordEnterRPCResponse> {
+  return await nanoRPCCall<PasswordEnterRPCResponse>(context, config, 'password_enter', { wallet, password });
 }
 
 /**
@@ -183,17 +179,15 @@ export async function passwordValid(
   context: IExecuteFunctions,
   config: INanoRPCConfig,
   wallet: string
-): Promise<boolean> {
-  const response = await nanoRPCCall<PasswordValidRPCResponse>(context, config, 'password_valid', { wallet });
-  return response.valid === '1';
+): Promise<PasswordValidRPCResponse> {
+  return await nanoRPCCall<PasswordValidRPCResponse>(context, config, 'password_valid', { wallet });
 }
 
 /**
  * Get the minimum receive threshold
  */
-export async function receiveMinimum(context: IExecuteFunctions, config: INanoRPCConfig): Promise<string> {
-  const response = await nanoRPCCall<ReceiveMinimumRPCResponse>(context, config, 'receive_minimum', {});
-  return response.amount;
+export async function receiveMinimum(context: IExecuteFunctions, config: INanoRPCConfig): Promise<ReceiveMinimumRPCResponse> {
+  return await nanoRPCCall<ReceiveMinimumRPCResponse>(context, config, 'receive_minimum', {});
 }
 
 /**
@@ -203,9 +197,8 @@ export async function receiveMinimumSet(
   context: IExecuteFunctions,
   config: INanoRPCConfig,
   amount: string
-): Promise<boolean> {
-  const response = await nanoRPCCall<ReceiveMinimumSetRPCResponse>(context, config, 'receive_minimum_set', { amount });
-  return response.success === '';
+): Promise<ReceiveMinimumSetRPCResponse> {
+  return await nanoRPCCall<ReceiveMinimumSetRPCResponse>(context, config, 'receive_minimum_set', { amount });
 }
 
 /**
@@ -215,17 +208,18 @@ export async function searchReceivable(
   context: IExecuteFunctions,
   config: INanoRPCConfig,
   wallet: string
-): Promise<boolean> {
-  const response = await nanoRPCCall<SearchReceivableRPCResponse>(context, config, 'search_receivable', { wallet });
-  return response.started === '1';
+): Promise<SearchReceivableRPCResponse> {
+  return await nanoRPCCall<SearchReceivableRPCResponse>(context, config, 'search_receivable', { wallet });
 }
 
 /**
  * Search receivable blocks for all wallets
  */
-export async function searchReceivableAll(context: IExecuteFunctions, config: INanoRPCConfig): Promise<boolean> {
-  const response = await nanoRPCCall<ReceiveMinimumSetRPCResponse>(context, config, 'search_receivable_all', {});
-  return response.success === '';
+export async function searchReceivableAll(
+  context: IExecuteFunctions,
+  config: INanoRPCConfig,
+): Promise<SearchReceivableRPCResponse> {
+  return await nanoRPCCall<SearchReceivableRPCResponse>(context, config, 'search_receivable_all', {});
 }
 
 /**
@@ -237,7 +231,7 @@ export async function walletAdd(
   wallet: string,
   key: string,
   options: WalletAddOptions = {}
-): Promise<string> {
+): Promise<WalletAddRPCResponse> {
   const params: Record<string, unknown> = { wallet, key };
 
   // Only send work=false when explicitly disabled (default is true)
@@ -245,8 +239,7 @@ export async function walletAdd(
     params.work = false;
   }
 
-  const response = await nanoRPCCall<WalletAddRPCResponse>(context, config, 'wallet_add', params);
-  return response.account;
+  return await nanoRPCCall<WalletAddRPCResponse>(context, config, 'wallet_add', params);
 }
 
 /**
@@ -257,9 +250,8 @@ export async function walletAddWatch(
   config: INanoRPCConfig,
   wallet: string,
   accounts: string[]
-): Promise<boolean> {
-  const response = await nanoRPCCall<WalletAddWatchRPCResponse>(context, config, 'wallet_add_watch', { wallet, accounts });
-  return response.success === '';
+): Promise<WalletAddWatchRPCResponse> {
+  return await nanoRPCCall<WalletAddWatchRPCResponse>(context, config, 'wallet_add_watch', { wallet, accounts });
 }
 
 /**
@@ -270,9 +262,8 @@ export async function walletBalances(
   config: INanoRPCConfig,
   wallet: string,
   threshold?: string
-): Promise<WalletBalancesRPCResponse['balances']> {
-  const response = await nanoRPCCall<WalletBalancesRPCResponse>(context, config, 'wallet_balances', { wallet, threshold });
-  return response.balances;
+): Promise<WalletBalancesRPCResponse> {
+  return await nanoRPCCall<WalletBalancesRPCResponse>(context, config, 'wallet_balances', { wallet, threshold });
 }
 
 /**
@@ -284,15 +275,10 @@ export async function walletChangeSeed(
   wallet: string,
   seed: string,
   count?: number
-): Promise<{ success: boolean; last_restored_account: string; restored_count: number }> {
-  const response = await nanoRPCCall<WalletChangeSeedRPCResponse>(
+): Promise<WalletChangeSeedRPCResponse> {
+  return await nanoRPCCall<WalletChangeSeedRPCResponse>(
     context, config, 'wallet_change_seed', { wallet, seed, count }
   );
-  return {
-    success: response.success === '',
-    last_restored_account: response.last_restored_account,
-    restored_count: parseInt(response.restored_count || '0'),
-  };
 }
 
 /**
@@ -303,9 +289,8 @@ export async function walletContains(
   config: INanoRPCConfig,
   wallet: string,
   account: string
-): Promise<boolean> {
-  const response = await nanoRPCCall<WalletContainsRPCResponse>(context, config, 'wallet_contains', { wallet, account });
-  return response.exists === '1';
+): Promise<WalletContainsRPCResponse> {
+  return await nanoRPCCall<WalletContainsRPCResponse>(context, config, 'wallet_contains', { wallet, account });
 }
 
 /**
@@ -315,15 +300,10 @@ export async function walletCreate(
   context: IExecuteFunctions,
   config: INanoRPCConfig,
   seed?: string
-): Promise<{ wallet: string; last_restored_account?: string; restored_count?: number }> {
-  const response = await nanoRPCCall<WalletCreateRPCResponse>(
+): Promise<WalletCreateRPCResponse> {
+  return await nanoRPCCall<WalletCreateRPCResponse>(
     context, config, 'wallet_create', { seed }
   );
-  return {
-    wallet: response.wallet,
-    last_restored_account: response.last_restored_account,
-    restored_count: response.restored_count ? parseInt(response.restored_count) : undefined,
-  };
 }
 
 /**
@@ -333,9 +313,8 @@ export async function walletDestroy(
   context: IExecuteFunctions,
   config: INanoRPCConfig,
   wallet: string
-): Promise<boolean> {
-  const response = await nanoRPCCall<WalletDestroyRPCResponse>(context, config, 'wallet_destroy', { wallet });
-  return response.destroyed === '1';
+): Promise<WalletDestroyRPCResponse> {
+  return await nanoRPCCall<WalletDestroyRPCResponse>(context, config, 'wallet_destroy', { wallet });
 }
 
 /**
@@ -345,9 +324,8 @@ export async function walletExport(
   context: IExecuteFunctions,
   config: INanoRPCConfig,
   wallet: string
-): Promise<string> {
-  const response = await nanoRPCCall<WalletExportRPCResponse>(context, config, 'wallet_export', { wallet });
-  return response.json;
+): Promise<WalletExportRPCResponse> {
+  return await nanoRPCCall<WalletExportRPCResponse>(context, config, 'wallet_export', { wallet });
 }
 
 /**
@@ -357,9 +335,8 @@ export async function walletFrontiers(
   context: IExecuteFunctions,
   config: INanoRPCConfig,
   wallet: string
-): Promise<Record<string, string>> {
-  const response = await nanoRPCCall<WalletFrontiersRPCResponse>(context, config, 'wallet_frontiers', { wallet });
-  return response.frontiers;
+): Promise<WalletFrontiersRPCResponse> {
+  return await nanoRPCCall<WalletFrontiersRPCResponse>(context, config, 'wallet_frontiers', { wallet });
 }
 
 /**
@@ -370,12 +347,11 @@ export async function walletHistory(
   config: INanoRPCConfig,
   wallet: string,
   modifiedSince?: number
-): Promise<WalletHistoryRPCResponse['history']> {
-  const response = await nanoRPCCall<WalletHistoryRPCResponse>(context, config, 'wallet_history', {
+): Promise<WalletHistoryRPCResponse> {
+  return await nanoRPCCall<WalletHistoryRPCResponse>(context, config, 'wallet_history', {
     wallet,
     modified_since: modifiedSince,
   });
-  return response.history;
 }
 
 /**
@@ -397,7 +373,7 @@ export async function walletLedger(
   config: INanoRPCConfig,
   wallet: string,
   options: WalletLedgerOptions = {}
-): Promise<WalletLedgerRPCResponse['accounts']> {
+): Promise<WalletLedgerRPCResponse> {
   const params: Record<string, unknown> = { wallet };
 
   if (options.representative !== undefined) {
@@ -413,8 +389,7 @@ export async function walletLedger(
     params.modified_since = options.modifiedSince;
   }
 
-  const response = await nanoRPCCall<WalletLedgerRPCResponse>(context, config, 'wallet_ledger', params);
-  return response.accounts;
+  return await nanoRPCCall<WalletLedgerRPCResponse>(context, config, 'wallet_ledger', params);
 }
 
 /**
@@ -424,9 +399,8 @@ export async function walletLock(
   context: IExecuteFunctions,
   config: INanoRPCConfig,
   wallet: string
-): Promise<boolean> {
-  const response = await nanoRPCCall<WalletLockRPCResponse>(context, config, 'wallet_lock', { wallet });
-  return response.locked === '1';
+): Promise<WalletLockRPCResponse> {
+  return await nanoRPCCall<WalletLockRPCResponse>(context, config, 'wallet_lock', { wallet });
 }
 
 /**
@@ -436,9 +410,8 @@ export async function walletLocked(
   context: IExecuteFunctions,
   config: INanoRPCConfig,
   wallet: string
-): Promise<boolean> {
-  const response = await nanoRPCCall<WalletLockedRPCResponse>(context, config, 'wallet_locked', { wallet });
-  return response.locked === '1';
+): Promise<WalletLockedRPCResponse> {
+  return await nanoRPCCall<WalletLockedRPCResponse>(context, config, 'wallet_locked', { wallet });
 }
 
 /**
@@ -449,7 +422,7 @@ export async function walletReceivable(
   config: INanoRPCConfig,
   wallet: string,
   options: WalletReceivableOptions = {}
-): Promise<WalletReceivableRPCResponse['blocks']> {
+): Promise<WalletReceivableRPCResponse> {
   const params: Record<string, unknown> = { wallet };
 
   if (options.count !== undefined) {
@@ -468,8 +441,7 @@ export async function walletReceivable(
     params.include_only_confirmed = options.includeOnlyConfirmed;
   }
 
-  const response = await nanoRPCCall<WalletReceivableRPCResponse>(context, config, 'wallet_receivable', params);
-  return response.blocks;
+  return await nanoRPCCall<WalletReceivableRPCResponse>(context, config, 'wallet_receivable', params);
 }
 
 /**
@@ -479,9 +451,8 @@ export async function walletRepresentative(
   context: IExecuteFunctions,
   config: INanoRPCConfig,
   wallet: string
-): Promise<string> {
-  const response = await nanoRPCCall<WalletRepresentativeRPCResponse>(context, config, 'wallet_representative', { wallet });
-  return response.representative;
+): Promise<WalletRepresentativeRPCResponse> {
+  return await nanoRPCCall<WalletRepresentativeRPCResponse>(context, config, 'wallet_representative', { wallet });
 }
 
 /**
@@ -493,13 +464,12 @@ export async function walletRepresentativeSet(
   wallet: string,
   representative: string,
   updateExisting?: boolean
-): Promise<boolean> {
-  const response = await nanoRPCCall<WalletRepresentativeSetRPCResponse>(context, config, 'wallet_representative_set', {
+): Promise<WalletRepresentativeSetRPCResponse> {
+  return await nanoRPCCall<WalletRepresentativeSetRPCResponse>(context, config, 'wallet_representative_set', {
     wallet,
     representative,
     update_existing_accounts: updateExisting,
   });
-  return response.set === '1';
 }
 
 /**
@@ -510,9 +480,8 @@ export async function walletRepublish(
   config: INanoRPCConfig,
   wallet: string,
   count?: number
-): Promise<string[]> {
-  const response = await nanoRPCCall<WalletRepublishRPCResponse>(context, config, 'wallet_republish', { wallet, count });
-  return response.blocks;
+): Promise<WalletRepublishRPCResponse> {
+  return await nanoRPCCall<WalletRepublishRPCResponse>(context, config, 'wallet_republish', { wallet, count });
 }
 
 /**
@@ -522,9 +491,8 @@ export async function walletWorkGet(
   context: IExecuteFunctions,
   config: INanoRPCConfig,
   wallet: string
-): Promise<Record<string, string>> {
-  const response = await nanoRPCCall<WalletWorkGetRPCResponse>(context, config, 'wallet_work_get', { wallet });
-  return response.works;
+): Promise<WalletWorkGetRPCResponse> {
+  return await nanoRPCCall<WalletWorkGetRPCResponse>(context, config, 'wallet_work_get', { wallet });
 }
 
 /**
@@ -535,9 +503,8 @@ export async function workGet(
   config: INanoRPCConfig,
   wallet: string,
   account: string
-): Promise<string> {
-  const response = await nanoRPCCall<WorkGetRPCResponse>(context, config, 'work_get', { wallet, account });
-  return response.work;
+): Promise<WorkGetRPCResponse> {
+  return await nanoRPCCall<WorkGetRPCResponse>(context, config, 'work_get', { wallet, account });
 }
 
 /**
@@ -549,7 +516,6 @@ export async function workSet(
   wallet: string,
   account: string,
   work: string
-): Promise<boolean> {
-  const response = await nanoRPCCall<WorkSetRPCResponse>(context, config, 'work_set', { wallet, account, work });
-  return response.success === '';
+): Promise<WorkSetRPCResponse> {
+  return await nanoRPCCall<WorkSetRPCResponse>(context, config, 'work_set', { wallet, account, work });
 }

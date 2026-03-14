@@ -19,30 +19,27 @@ import type {
 /**
  * Get the total available supply of Nano
  */
-export async function getAvailableSupply(context: IExecuteFunctions, config: INanoRPCConfig): Promise<string> {
-  const response = await nanoRPCCall<AvailableSupplyRPCResponse>(context, config, 'available_supply');
-  return response.available;
+export async function getAvailableSupply(context: IExecuteFunctions, config: INanoRPCConfig): Promise<AvailableSupplyRPCResponse> {
+  return await nanoRPCCall<AvailableSupplyRPCResponse>(context, config, 'available_supply');
 }
 
 /**
  * Keepalive with specific peers
  */
-export async function keepalive(context: IExecuteFunctions, config: INanoRPCConfig, address: string, port: number): Promise<boolean> {
+export async function keepalive(
+  context: IExecuteFunctions,
+  config: INanoRPCConfig,
+  address: string,
+  port: number,
+): Promise<void> {
   await nanoRPCCall(context, config, 'keepalive', { address, port: port.toString() });
-  return true;
 }
 
 /**
  * Get node ID
  */
 export async function getNodeId(context: IExecuteFunctions, config: INanoRPCConfig): Promise<NodeIdRPCResponse> {
-  const response = await nanoRPCCall<NodeIdRPCResponse>(context, config, 'node_id');
-  return {
-    private: response.private,
-    public: response.public,
-    as_account: response.as_account,
-    node_id: response.node_id,
-  };
+  return await nanoRPCCall<NodeIdRPCResponse>(context, config, 'node_id');
 }
 
 /**
@@ -63,9 +60,8 @@ export async function getPeers(
 /**
  * Populate priority queue for election prioritization
  */
-export async function populateBacklog(context: IExecuteFunctions, config: INanoRPCConfig): Promise<boolean> {
+export async function populateBacklog(context: IExecuteFunctions, config: INanoRPCConfig): Promise<void> {
   await nanoRPCCall(context, config, 'populate_backlog');
-  return true;
 }
 
 /**
@@ -76,15 +72,14 @@ export async function getRepresentatives(
   config: INanoRPCConfig,
   count?: number,
   sorting?: boolean
-): Promise<Record<string, string>> {
+): Promise<RepresentativesRPCResponse> {
   const params: Record<string, number | boolean> = {};
   if (sorting) {
     params.sorting = true;
   } else if (count !== undefined && count > 0) {
     params.count = count;
   }
-  const response = await nanoRPCCall<RepresentativesRPCResponse>(context, config, 'representatives', params);
-  return response.representatives;
+  return await nanoRPCCall<RepresentativesRPCResponse>(context, config, 'representatives', params);
 }
 
 /**
@@ -116,8 +111,7 @@ export async function republish(
   sources?: number,
   destinations?: number
 ): Promise<RepublishRPCResponse> {
-  const response = await nanoRPCCall<RepublishRPCResponse>(context, config, 'republish', { hash, count, sources, destinations });
-  return { blocks: response.blocks };
+  return await nanoRPCCall<RepublishRPCResponse>(context, config, 'republish', { hash, count, sources, destinations });
 }
 
 /**
@@ -148,23 +142,12 @@ export async function getTelemetry(
  * Get node version information
  */
 export async function getVersion(context: IExecuteFunctions, config: INanoRPCConfig): Promise<VersionRPCResponse> {
-  const response = await nanoRPCCall<VersionRPCResponse>(context, config, 'version');
-  return {
-    rpc_version: response.rpc_version,
-    store_version: response.store_version,
-    protocol_version: response.protocol_version,
-    node_vendor: response.node_vendor,
-    store_vendor: response.store_vendor,
-    network: response.network,
-    network_identifier: response.network_identifier,
-    build_info: response.build_info,
-  };
+  return await nanoRPCCall<VersionRPCResponse>(context, config, 'version');
 }
 
 /**
  * Get node uptime in seconds
  */
-export async function getUptime(context: IExecuteFunctions, config: INanoRPCConfig): Promise<number> {
-  const response = await nanoRPCCall<UptimeRPCResponse>(context, config, 'uptime');
-  return parseInt(response.seconds);
+export async function getUptime(context: IExecuteFunctions, config: INanoRPCConfig): Promise<UptimeRPCResponse> {
+  return await nanoRPCCall<UptimeRPCResponse>(context, config, 'uptime');
 }

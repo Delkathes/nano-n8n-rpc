@@ -24,6 +24,7 @@ export type {
   AccountRepresentativeRPCResponse,
   AccountWeightRPCResponse,
   AccountsFrontiersRPCResponse,
+  AccountsBalancesRPCResponse,
   AccountsRepresentativesRPCResponse,
   ValidateAccountRPCResponse,
   AccountInfoRPCResponse,
@@ -152,6 +153,7 @@ export type {
   WorkPeersRPCResponse,
   WorkPeersClearRPCResponse,
   WorkGenerateResponse,
+  WorkValidateRPCResponse,
   WorkValidateResponse,
   WorkGenerateOptions,
   WorkValidateOptions,
@@ -164,6 +166,11 @@ export type {
   SignRPCResponse,
   SignOptions,
 } from './keys';
+
+// Conversion types
+export type {
+  AmountConversionRPCResponse,
+} from './conversion';
 
 // Debug/Admin types
 export type {

@@ -17,36 +17,21 @@ export async function getDeterministicKey(
   seed: string,
   index: number
 ): Promise<DeterministicKeyRPCResponse> {
-  const response = await nanoRPCCall<DeterministicKeyRPCResponse>(context, config, 'deterministic_key', { seed, index });
-  return {
-    private: response.private,
-    public: response.public,
-    account: response.account,
-  };
+  return await nanoRPCCall<DeterministicKeyRPCResponse>(context, config, 'deterministic_key', { seed, index });
 }
 
 /**
  * Generate a new random keypair
  */
 export async function createKey(context: IExecuteFunctions, config: INanoRPCConfig): Promise<KeyPairResponse> {
-  const response = await nanoRPCCall<KeyPairResponse>(context, config, 'key_create');
-  return {
-    private: response.private,
-    public: response.public,
-    account: response.account,
-  };
+  return await nanoRPCCall<KeyPairResponse>(context, config, 'key_create');
 }
 
 /**
  * Expand a private key to get public key and account
  */
 export async function expandKey(context: IExecuteFunctions, config: INanoRPCConfig, key: string): Promise<KeyPairResponse> {
-  const response = await nanoRPCCall<KeyPairResponse>(context, config, 'key_expand', { key });
-  return {
-    private: response.private,
-    public: response.public,
-    account: response.account,
-  };
+  return await nanoRPCCall<KeyPairResponse>(context, config, 'key_expand', { key });
 }
 
 /**
@@ -58,9 +43,8 @@ export async function sign(
   config: INanoRPCConfig,
   key: string,
   hash: string
-): Promise<string> {
-  const response = await nanoRPCCall<{ signature: string }>(context, config, 'sign', { key, hash });
-  return response.signature;
+): Promise<SignRPCResponse> {
+  return await nanoRPCCall<SignRPCResponse>(context, config, 'sign', { key, hash });
 }
 
 /**

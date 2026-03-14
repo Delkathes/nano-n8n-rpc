@@ -15,7 +15,7 @@ export async function getDelegators(
   config: INanoRPCConfig,
   account: string,
   options: GetDelegatorsOptions = {}
-): Promise<Record<string, string>> {
+): Promise<DelegatorsRPCResponse> {
   const params: Record<string, string | number> = { account };
   
   if (options.threshold) {
@@ -28,14 +28,16 @@ export async function getDelegators(
     params.start = options.start;
   }
   
-  const response = await nanoRPCCall<DelegatorsRPCResponse>(context, config, 'delegators', params);
-  return response.delegators;
+  return await nanoRPCCall<DelegatorsRPCResponse>(context, config, 'delegators', params);
 }
 
 /**
  * Get number of delegators for a representative
  */
-export async function getDelegatorsCount(context: IExecuteFunctions, config: INanoRPCConfig, account: string): Promise<number> {
-  const response = await nanoRPCCall<DelegatorsCountRPCResponse>(context, config, 'delegators_count', { account });
-  return parseInt(response.count);
+export async function getDelegatorsCount(
+  context: IExecuteFunctions,
+  config: INanoRPCConfig,
+  account: string,
+): Promise<DelegatorsCountRPCResponse> {
+  return await nanoRPCCall<DelegatorsCountRPCResponse>(context, config, 'delegators_count', { account });
 }

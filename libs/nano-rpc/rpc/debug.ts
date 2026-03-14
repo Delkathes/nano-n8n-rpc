@@ -6,13 +6,20 @@ import type {
   StatsRPCResponse,
   UncheckedRPCResponse,
   UncheckedKeysRPCResponse,
-  BlockContents,
   BootstrapOptions,
   BootstrapAnyOptions,
   BootstrapLazyOptions,
   DatabaseTxnTrackerOptions,
   BootstrapPrioritiesRPCResponse,
   DatabaseTxnTrackerRPCResponse,
+  BootstrapRPCResponse,
+  BootstrapAnyRPCResponse,
+  BootstrapLazyRPCResponse,
+  BootstrapResetRPCResponse,
+  StatsClearRPCResponse,
+  StopRPCResponse,
+  UncheckedClearRPCResponse,
+  UncheckedGetRPCResponse,
 } from '../../../types/rpc';
 
 /**
@@ -24,14 +31,13 @@ export async function bootstrap(
   address: string,
   port: number,
   options?: BootstrapOptions,
-): Promise<boolean> {
-  await nanoRPCCall(context, config, 'bootstrap', {
+): Promise<BootstrapRPCResponse> {
+  return await nanoRPCCall<BootstrapRPCResponse>(context, config, 'bootstrap', {
     address,
     port: port.toString(),
     bypass_frontier_confirmation: options?.bypassFrontierConfirmation,
     id: options?.id,
   });
-  return true;
 }
 
 /**
@@ -41,13 +47,12 @@ export async function bootstrapAny(
   context: IExecuteFunctions,
   config: INanoRPCConfig,
   options?: BootstrapAnyOptions,
-): Promise<boolean> {
-  await nanoRPCCall(context, config, 'bootstrap_any', {
+): Promise<BootstrapAnyRPCResponse> {
+  return await nanoRPCCall<BootstrapAnyRPCResponse>(context, config, 'bootstrap_any', {
     force: options?.force,
     id: options?.id,
     account: options?.account,
   });
-  return true;
 }
 
 /**
@@ -58,13 +63,12 @@ export async function bootstrapLazy(
   config: INanoRPCConfig,
   hash: string,
   options?: BootstrapLazyOptions,
-): Promise<boolean> {
-  await nanoRPCCall(context, config, 'bootstrap_lazy', {
+): Promise<BootstrapLazyRPCResponse> {
+  return await nanoRPCCall<BootstrapLazyRPCResponse>(context, config, 'bootstrap_lazy', {
     hash,
     force: options?.force,
     id: options?.id,
   });
-  return true;
 }
 
 /**
@@ -77,9 +81,8 @@ export async function getBootstrapPriorities(context: IExecuteFunctions, config:
 /**
  * Reset bootstrap attempts
  */
-export async function resetBootstrap(context: IExecuteFunctions, config: INanoRPCConfig): Promise<boolean> {
-  await nanoRPCCall(context, config, 'bootstrap_reset');
-  return true;
+export async function resetBootstrap(context: IExecuteFunctions, config: INanoRPCConfig): Promise<BootstrapResetRPCResponse> {
+  return await nanoRPCCall<BootstrapResetRPCResponse>(context, config, 'bootstrap_reset');
 }
 
 /**
@@ -113,17 +116,15 @@ export async function getStats(context: IExecuteFunctions, config: INanoRPCConfi
 /**
  * Clear node statistics
  */
-export async function clearStats(context: IExecuteFunctions, config: INanoRPCConfig): Promise<boolean> {
-  await nanoRPCCall(context, config, 'stats_clear');
-  return true;
+export async function clearStats(context: IExecuteFunctions, config: INanoRPCConfig): Promise<StatsClearRPCResponse> {
+  return await nanoRPCCall<StatsClearRPCResponse>(context, config, 'stats_clear');
 }
 
 /**
  * Stop the node
  */
-export async function stopNode(context: IExecuteFunctions, config: INanoRPCConfig): Promise<boolean> {
-  await nanoRPCCall(context, config, 'stop');
-  return true;
+export async function stopNode(context: IExecuteFunctions, config: INanoRPCConfig): Promise<StopRPCResponse> {
+  return await nanoRPCCall<StopRPCResponse>(context, config, 'stop');
 }
 
 /**
@@ -136,17 +137,19 @@ export async function getUnchecked(context: IExecuteFunctions, config: INanoRPCC
 /**
  * Clear unchecked blocks
  */
-export async function clearUnchecked(context: IExecuteFunctions, config: INanoRPCConfig): Promise<boolean> {
-  await nanoRPCCall(context, config, 'unchecked_clear');
-  return true;
+export async function clearUnchecked(context: IExecuteFunctions, config: INanoRPCConfig): Promise<UncheckedClearRPCResponse> {
+  return await nanoRPCCall<UncheckedClearRPCResponse>(context, config, 'unchecked_clear');
 }
 
 /**
  * Get a specific unchecked block
  */
-export async function getUncheckedBlock(context: IExecuteFunctions, config: INanoRPCConfig, hash: string): Promise<BlockContents> {
-  const response = await nanoRPCCall<{ contents: BlockContents }>(context, config, 'unchecked_get', { hash, json_block: true });
-  return response.contents;
+export async function getUncheckedBlock(
+  context: IExecuteFunctions,
+  config: INanoRPCConfig,
+  hash: string,
+): Promise<UncheckedGetRPCResponse> {
+  return await nanoRPCCall<UncheckedGetRPCResponse>(context, config, 'unchecked_get', { hash, json_block: true });
 }
 
 /**

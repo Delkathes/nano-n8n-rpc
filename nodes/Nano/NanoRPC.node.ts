@@ -80,7 +80,7 @@ export class NanoRPC implements INodeType {
 						const amountRaw = nanoToRaw(amount);
 
 						// Send payment
-						const blockHash = await rpc.send(
+						const { block: blockHash } = await rpc.send(
 							manualWalletId.length > 0 ? manualWalletId : credentialsWalletId,
 							sourceAccount,
 							destination,
@@ -263,11 +263,11 @@ export class NanoRPC implements INodeType {
 							});
 						}
 
-						const blockCount = await rpc.getAccountBlockCount(account);
+						const { block_count } = await rpc.getAccountBlockCount(account);
 
 						responseData = {
 							account,
-							blockCount,
+							blockCount: parseInt(block_count),
 						};
 						break;
 					}
@@ -281,7 +281,7 @@ export class NanoRPC implements INodeType {
 							});
 						}
 
-						const publicKey = await rpc.getAccountKey(account);
+						const { key: publicKey } = await rpc.getAccountKey(account);
 
 						responseData = {
 							account,
@@ -299,7 +299,7 @@ export class NanoRPC implements INodeType {
 							});
 						}
 
-						const representative = await rpc.getAccountRepresentative(account);
+						const { representative } = await rpc.getAccountRepresentative(account);
 
 						responseData = {
 							account,
@@ -317,7 +317,7 @@ export class NanoRPC implements INodeType {
 							});
 						}
 
-						const weight = await rpc.getAccountWeight(account);
+						const { weight } = await rpc.getAccountWeight(account);
 
 						responseData = {
 							account,
@@ -372,7 +372,7 @@ export class NanoRPC implements INodeType {
 							});
 						}
 
-						const account = await rpc.getBlockAccount(blockHash);
+						const { account } = await rpc.getBlockAccount(blockHash);
 
 						responseData = {
 							blockHash,
@@ -460,7 +460,7 @@ export class NanoRPC implements INodeType {
 						if (countParam > 0) options.count = countParam;
 						if (start) options.start = start;
 
-						const delegators = await rpc.getDelegators(
+						const { delegators } = await rpc.getDelegators(
 							account,
 							Object.keys(options).length > 0 ? options : undefined
 						);
@@ -482,11 +482,11 @@ export class NanoRPC implements INodeType {
 							});
 						}
 
-						const count = await rpc.getDelegatorsCount(account);
+						const { count } = await rpc.getDelegatorsCount(account);
 
 						responseData = {
 							account,
-							delegatorCount: count,
+							delegatorCount: parseInt(count),
 						};
 						break;
 					}
@@ -519,7 +519,7 @@ export class NanoRPC implements INodeType {
 							});
 						}
 
-						const receiveBlockHash = await rpc.receive(
+						const { block: receiveBlockHash } = await rpc.receive(
 							manualWalletId.length > 0 ? manualWalletId : credentialsWalletId,
 							receivingAccount,
 							blockHash,
@@ -539,11 +539,11 @@ export class NanoRPC implements INodeType {
 					case 'validate': {
 						const addressToValidate = this.getNodeParameter('addressToValidate', i) as string;
 
-						const isValid = await rpc.validateAccount(addressToValidate);
+						const { valid } = await rpc.validateAccount(addressToValidate);
 
 						responseData = {
 							address: addressToValidate,
-							valid: isValid,
+							valid: valid === '1',
 						};
 						break;
 					}
@@ -593,7 +593,7 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const newAccount = await rpc.createAccount(walletId, createOptions);
+						const { account: newAccount } = await rpc.createAccount(walletId, createOptions);
 
 						responseData = {
 							success: true,
@@ -619,7 +619,7 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const accounts = await rpc.listAccounts(walletId);
+						const { accounts } = await rpc.listAccounts(walletId);
 
 						responseData = {
 							wallet: walletId,
@@ -657,11 +657,11 @@ export class NanoRPC implements INodeType {
 
 
 
-						const moved = await rpc.accountMove(walletId, targetWallet,  accountsToMove);
+						const { moved } = await rpc.accountMove(walletId, targetWallet,  accountsToMove);
 
 						responseData = {
 							success: true,
-							moved,
+							moved: parseInt(moved),
 						};
 						break;
 					}
@@ -689,11 +689,11 @@ export class NanoRPC implements INodeType {
 						}
 
 
-						const removed = await rpc.accountRemove(walletId, accountToRemove);
+						const { removed } = await rpc.accountRemove(walletId, accountToRemove);
 
 						responseData = {
 							success: true,
-							removed,
+							removed: removed === '1',
 						};
 						break;
 					}
@@ -734,7 +734,7 @@ export class NanoRPC implements INodeType {
 						}
 
 
-						const block = await rpc.accountRepresentativeSet(
+						const { block } = await rpc.accountRepresentativeSet(
 							walletId,
 							walletAccount,
 							representativeAddress,
@@ -763,7 +763,7 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const accounts = await rpc.accountsCreate(walletId, accountCount, { work: accountsCreateWork });
+						const { accounts } = await rpc.accountsCreate(walletId, accountCount, { work: accountsCreateWork });
 
 						responseData = {
 							success: true,
@@ -786,11 +786,11 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const changed = await rpc.passwordChange(walletId, walletPassword);
+						const { changed } = await rpc.passwordChange(walletId, walletPassword);
 
 						responseData = {
 							success: true,
-							changed,
+							changed: changed === '1',
 						};
 						break;
 					}
@@ -809,11 +809,11 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const valid = await rpc.passwordEnter(walletId, walletPassword);
+						const { valid } = await rpc.passwordEnter(walletId, walletPassword);
 
 						responseData = {
 							success: true,
-							valid,
+							valid: valid === '1',
 						};
 						break;
 					}
@@ -831,16 +831,16 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const valid = await rpc.passwordValid(walletId);
+						const { valid } = await rpc.passwordValid(walletId);
 
 						responseData = {
-							valid,
+							valid: valid === '1',
 						};
 						break;
 					}
 
 					case 'receiveMinimum': {
-						const amount = await rpc.receiveMinimum();
+						const { amount } = await rpc.receiveMinimum();
 
 						responseData = {
 							amount,
@@ -852,10 +852,10 @@ export class NanoRPC implements INodeType {
 					case 'receiveMinimumSet': {
 						const minimumAmount = this.getNodeParameter('minimumAmount', i) as string;
 
-						const success = await rpc.receiveMinimumSet(minimumAmount);
+						const { success } = await rpc.receiveMinimumSet(minimumAmount);
 
 						responseData = {
-							success,
+							success: success === '',
 						};
 						break;
 					}
@@ -863,20 +863,20 @@ export class NanoRPC implements INodeType {
 					case 'searchReceivable': {
 						const searchWallet = this.getNodeParameter('searchWallet', i) as string;
 
-						const started = await rpc.searchReceivable(searchWallet);
+						const { started } = await rpc.searchReceivable(searchWallet);
 
 						responseData = {
 							success: true,
-							started,
+							started: started === '1',
 						};
 						break;
 					}
 
 					case 'searchReceivableAll': {
-						const success = await rpc.searchReceivableAll();
+						const { started } = await rpc.searchReceivableAll();
 
 						responseData = {
-							success,
+							success: started === '1',
 						};
 						break;
 					}
@@ -896,7 +896,7 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const account = await rpc.walletAdd(
+						const { account } = await rpc.walletAdd(
 							walletId,
 							walletPrivateKey,
 							walletAddDisableWork ? { work: false } : undefined,
@@ -935,10 +935,10 @@ export class NanoRPC implements INodeType {
 						}
 
 
-						const success = await rpc.walletAddWatch(walletId, watchAccounts);
+						const { success } = await rpc.walletAddWatch(walletId, watchAccounts);
 
 						responseData = {
-							success,
+							success: success === '',
 						};
 						break;
 					}
@@ -958,7 +958,7 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const balances = await rpc.walletBalances(walletId, balanceThreshold || undefined);
+						const { balances } = await rpc.walletBalances(walletId, balanceThreshold || undefined);
 
 						responseData = {
 							wallet: walletId,
@@ -985,9 +985,9 @@ export class NanoRPC implements INodeType {
 						const result = await rpc.walletChangeSeed(walletId, newSeed, restoreCount || undefined);
 
 						responseData = {
-							success: result.success,
+							success: result.success === '',
 							lastRestoredAccount: result.last_restored_account,
-							restoredCount: result.restored_count,
+							restoredCount: parseInt(result.restored_count || '0'),
 						};
 						break;
 					}
@@ -1014,12 +1014,12 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const exists = await rpc.walletContains(walletId, walletAccount);
+						const { exists } = await rpc.walletContains(walletId, walletAccount);
 
 						responseData = {
 							wallet: walletId,
 							account: walletAccount,
-							exists,
+							exists: exists === '1',
 						};
 						break;
 					}
@@ -1033,7 +1033,7 @@ export class NanoRPC implements INodeType {
 							success: true,
 							wallet: result.wallet,
 							lastRestoredAccount: result.last_restored_account,
-							restoredCount: result.restored_count,
+							restoredCount: result.restored_count ? parseInt(result.restored_count) : undefined,
 						};
 						break;
 					}
@@ -1041,11 +1041,11 @@ export class NanoRPC implements INodeType {
 					case 'walletDestroy': {
 						const walletToDestroy = this.getNodeParameter('walletToDestroy', i) as string;
 
-						const destroyed = await rpc.walletDestroy(walletToDestroy);
+						const { destroyed } = await rpc.walletDestroy(walletToDestroy);
 
 						responseData = {
 							success: true,
-							destroyed,
+							destroyed: destroyed === '1',
 						};
 						break;
 					}
@@ -1063,7 +1063,7 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const json = await rpc.walletExport(walletId);
+						const { json } = await rpc.walletExport(walletId);
 
 						responseData = {
 							wallet: walletId,
@@ -1085,7 +1085,7 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const frontiers = await rpc.walletFrontiers(walletId);
+						const { frontiers } = await rpc.walletFrontiers(walletId);
 
 						responseData = {
 							wallet: walletId,
@@ -1108,7 +1108,7 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const history = await rpc.walletHistory(walletId, modifiedSince || undefined);
+						const { history } = await rpc.walletHistory(walletId, modifiedSince || undefined);
 
 						responseData = {
 							wallet: walletId,
@@ -1168,7 +1168,7 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const accounts = await rpc.walletLedger(walletId, {
+						const { accounts } = await rpc.walletLedger(walletId, {
 							representative: includeRepresentative || undefined,
 							weight: includeWeight || undefined,
 							receivable: includeReceivable || undefined,
@@ -1195,11 +1195,11 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const locked = await rpc.walletLock(walletId);
+						const { locked } = await rpc.walletLock(walletId);
 
 						responseData = {
 							success: true,
-							locked,
+							locked: locked === '1',
 						};
 						break;
 					}
@@ -1217,11 +1217,11 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const locked = await rpc.walletLocked(walletId);
+						const { locked } = await rpc.walletLocked(walletId);
 
 						responseData = {
 							wallet: walletId,
-							locked,
+							locked: locked === '1',
 						};
 						break;
 					}
@@ -1244,7 +1244,7 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const blocks = await rpc.walletReceivable(walletId, {
+						const { blocks } = await rpc.walletReceivable(walletId, {
 							count,
 							threshold: balanceThreshold || undefined,
 							source: includeSource,
@@ -1272,7 +1272,7 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const representative = await rpc.walletRepresentative(walletId);
+						const { representative } = await rpc.walletRepresentative(walletId);
 
 						responseData = {
 							wallet: walletId,
@@ -1308,7 +1308,7 @@ export class NanoRPC implements INodeType {
 						}
 
 
-						const set = await rpc.walletRepresentativeSet(
+						const { set } = await rpc.walletRepresentativeSet(
 							walletId,
 							representativeAddress,
 							updateExisting,
@@ -1316,7 +1316,7 @@ export class NanoRPC implements INodeType {
 
 						responseData = {
 							success: true,
-							set,
+							set: set === '1',
 						};
 						break;
 					}
@@ -1335,7 +1335,7 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const blocks = await rpc.walletRepublish(walletId, republishCount);
+						const { blocks } = await rpc.walletRepublish(walletId, republishCount);
 
 						responseData = {
 							success: true,
@@ -1357,7 +1357,7 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const works = await rpc.walletWorkGet(walletId);
+						const { works } = await rpc.walletWorkGet(walletId);
 
 						responseData = {
 							wallet: walletId,
@@ -1389,7 +1389,7 @@ export class NanoRPC implements INodeType {
 						}
 
 
-						const work = await rpc.workGet(walletId, walletAccount);
+						const { work } = await rpc.workGet(walletId, walletAccount);
 
 						responseData = {
 							wallet: walletId,
@@ -1423,10 +1423,10 @@ export class NanoRPC implements INodeType {
 						}
 
 
-						const success = await rpc.workSet(walletId, walletAccount, workValue);
+						const { success } = await rpc.workSet(walletId, walletAccount, workValue);
 
 						responseData = {
-							success,
+							success: success === '',
 						};
 						break;
 					}
@@ -1440,10 +1440,10 @@ export class NanoRPC implements INodeType {
 							});
 						}
 
-						const confirmed = await rpc.confirmBlock(blockHash);
+						const { started } = await rpc.confirmBlock(blockHash);
 
 						responseData = {
-							success: confirmed,
+							success: started === '1',
 						};
 						break;
 					}
@@ -1460,7 +1460,7 @@ export class NanoRPC implements INodeType {
 							}
 						}
 
-						const blocks = await rpc.getBlocks(blockHashes);
+						const { blocks } = await rpc.getBlocks(blockHashes);
 
 						responseData = {
 							blocks,
@@ -1520,11 +1520,11 @@ export class NanoRPC implements INodeType {
 						if (includeActive) options.includeActive = true;
 						if (!includeOnlyConfirmed) options.includeOnlyConfirmed = false;
 
-						const exists = await rpc.receivableExists(blockHash, Object.keys(options).length > 0 ? options : undefined);
+						const { exists } = await rpc.receivableExists(blockHash, Object.keys(options).length > 0 ? options : undefined);
 
 						responseData = {
 							hash: blockHash,
-							exists,
+							exists: exists === '1',
 						};
 						break;
 					}
@@ -1545,7 +1545,7 @@ export class NanoRPC implements INodeType {
 						if (offset > 0) options.offset = offset;
 						if (reverse) options.reverse = true;
 
-						const chain = await rpc.getChain(blockHash, count, Object.keys(options).length > 0 ? options : undefined);
+						const { blocks: chain } = await rpc.getChain(blockHash, count, Object.keys(options).length > 0 ? options : undefined);
 
 						responseData = {
 							startingBlock: blockHash,
@@ -1601,7 +1601,7 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const frontiers = await rpc.getFrontiers(startingAccount, count);
+						const { frontiers } = await rpc.getFrontiers(startingAccount, count);
 
 						responseData = {
 							startingAccount,
@@ -1712,11 +1712,11 @@ export class NanoRPC implements INodeType {
 						responseData = {
 							work,
 							hash: blockHash,
-							valid: validationResult.valid,
-							validAll: validationResult.validAll,
-							validReceive: validationResult.validReceive,
+							valid: validationResult.valid !== undefined ? validationResult.valid === '1' : undefined,
+							validAll: validationResult.valid_all === '1',
+							validReceive: validationResult.valid_receive === '1',
 							difficulty: validationResult.difficulty,
-							multiplier: validationResult.multiplier,
+							multiplier: parseFloat(validationResult.multiplier),
 						};
 						break;
 					}
@@ -1836,7 +1836,7 @@ export class NanoRPC implements INodeType {
 							}
 						}
 
-						const balances = await rpc.getAccountsBalances(accounts, {
+						const { balances } = await rpc.getAccountsBalances(accounts, {
 							includeOnlyConfirmed,
 						});
 
@@ -1849,7 +1849,7 @@ export class NanoRPC implements INodeType {
 					case 'getAccountFromPublicKey': {
 						const publicKey = this.getNodeParameter('publicKey', i) as string;
 
-						const account = await rpc.getAccountFromPublicKey(publicKey);
+						const { account } = await rpc.getAccountFromPublicKey(publicKey);
 
 						responseData = {
 							publicKey,
@@ -1859,7 +1859,7 @@ export class NanoRPC implements INodeType {
 					}
 
 					case 'getAvailableSupply': {
-						const supply = await rpc.getAvailableSupply();
+						const { available: supply } = await rpc.getAvailableSupply();
 
 						responseData = {
 							availableSupply: rawToNano(supply),
@@ -1884,7 +1884,7 @@ export class NanoRPC implements INodeType {
 						const countParam = this.getNodeParameter('count', i, 0) as number;
 						const count = countParam > 0 ? countParam : undefined;
 
-						const representatives = await rpc.getRepresentatives(count, sorting);
+						const { representatives } = await rpc.getRepresentatives(count, sorting);
 
 						responseData = {
 							representatives,
@@ -1893,11 +1893,10 @@ export class NanoRPC implements INodeType {
 					}
 
 					case 'getUptime': {
-						const uptime = await rpc.getUptime();
+						const { seconds } = await rpc.getUptime();
 
 						responseData = {
-							seconds:
-								typeof uptime === 'object' ? (uptime as { seconds: number }).seconds : uptime,
+							seconds: parseInt(seconds),
 						};
 						break;
 					}
@@ -1952,13 +1951,13 @@ export class NanoRPC implements INodeType {
 						) as boolean;
 						const bootstrapId = this.getNodeParameter('bootstrapId', i, '') as string;
 
-						await rpc.bootstrap(bootstrapAddress, bootstrapPort, {
+						const { success } = await rpc.bootstrap(bootstrapAddress, bootstrapPort, {
 							bypassFrontierConfirmation: bypassFrontierConfirmation || undefined,
 							id: bootstrapId || undefined,
 						});
 
 						responseData = {
-							success: true,
+							success: success === '',
 							address: bootstrapAddress,
 							port: bootstrapPort,
 						};
@@ -1966,10 +1965,10 @@ export class NanoRPC implements INodeType {
 					}
 
 					case 'stopNode': {
-						await rpc.stopNode();
+						const { success } = await rpc.stopNode();
 
 						responseData = {
-							success: true,
+							success: success === '',
 						};
 						break;
 					}
@@ -1988,7 +1987,7 @@ export class NanoRPC implements INodeType {
 							}
 						}
 
-						const frontiers = await rpc.getAccountsFrontiers(accountsList);
+						const { frontiers } = await rpc.getAccountsFrontiers(accountsList);
 
 						responseData = {
 							accounts: accountsList,
@@ -2045,7 +2044,7 @@ export class NanoRPC implements INodeType {
 							}
 						}
 
-						const representatives = await rpc.getAccountsRepresentatives(accountsList);
+						const { representatives } = await rpc.getAccountsRepresentatives(accountsList);
 
 						responseData = {
 							accounts: accountsList,
@@ -2111,7 +2110,7 @@ export class NanoRPC implements INodeType {
 							});
 						}
 
-						const hash = await rpc.getBlockHash(blockParams, jsonBlock);
+						const { hash } = await rpc.getBlockHash(blockParams, jsonBlock);
 
 						responseData = {
 							hash,
@@ -2125,13 +2124,13 @@ export class NanoRPC implements INodeType {
 						const epochKey = this.getNodeParameter('epochKey', i) as string;
 						const count = this.getNodeParameter('count', i, 1) as number;
 
-						const result = await rpc.epochUpgrade(epoch, epochKey, count);
+						const { started } = await rpc.epochUpgrade(epoch, epochKey, count);
 
 						responseData = {
-							success: true,
+							success: started === '1',
 							epoch,
 							count,
-							result,
+							started: started === '1',
 						};
 						break;
 					}
@@ -2154,7 +2153,7 @@ export class NanoRPC implements INodeType {
 						const nodeId = await rpc.getNodeId();
 
 						responseData = {
-							nodeId,
+							...nodeId,
 						};
 						break;
 					}
@@ -2180,7 +2179,7 @@ export class NanoRPC implements INodeType {
 							});
 						}
 
-						const result = await rpc.republish(republishHash, count, sources, destinations);
+						const { blocks } = await rpc.republish(republishHash, count, sources, destinations);
 
 						responseData = {
 							success: true,
@@ -2188,13 +2187,13 @@ export class NanoRPC implements INodeType {
 							count,
 							sources,
 							destinations,
-							result,
+							blocks,
 						};
 						break;
 					}
 
 					case 'getFrontierCount': {
-						const count = await rpc.getFrontierCount();
+						const { count } = await rpc.getFrontierCount();
 
 						responseData = {
 							count,
@@ -2212,7 +2211,7 @@ export class NanoRPC implements INodeType {
 						if (offset > 0) options.offset = offset;
 						if (reverse) options.reverse = true;
 
-						const successors = await rpc.getSuccessors(startingBlock, count, Object.keys(options).length > 0 ? options : undefined);
+						const { blocks: successors } = await rpc.getSuccessors(startingBlock, count, Object.keys(options).length > 0 ? options : undefined);
 
 						responseData = {
 							startingBlock,
@@ -2233,7 +2232,7 @@ export class NanoRPC implements INodeType {
 							);
 						}
 
-						const unopened = await rpc.getUnopened(unopenedAccount || undefined, count);
+						const { accounts: unopened } = await rpc.getUnopened(unopenedAccount || undefined, count);
 
 						responseData = {
 							accounts: unopened,
@@ -2320,7 +2319,7 @@ export class NanoRPC implements INodeType {
 					}
 
 					case 'getWorkPeers': {
-						const peers = await rpc.getWorkPeers();
+						const { work_peers: peers } = await rpc.getWorkPeers();
 
 						responseData = {
 							workPeers: peers,
@@ -2342,14 +2341,14 @@ export class NanoRPC implements INodeType {
 						const bootstrapId = this.getNodeParameter('bootstrapId', i, '') as string;
 						const account = this.getNodeParameter('bootstrapAnyAccount', i, '') as string;
 
-						await rpc.bootstrapAny({
+						const { success } = await rpc.bootstrapAny({
 							force: force || undefined,
 							id: bootstrapId || undefined,
 							account: account || undefined,
 						});
 
 						responseData = {
-							success: true,
+							success: success === '',
 						};
 						break;
 					}
@@ -2359,15 +2358,16 @@ export class NanoRPC implements INodeType {
 						const force = this.getNodeParameter('force', i, false) as boolean;
 						const bootstrapId = this.getNodeParameter('bootstrapId', i, '') as string;
 
-						await rpc.bootstrapLazy(lazyHash, {
+						const lazyResult = await rpc.bootstrapLazy(lazyHash, {
 							force: force || undefined,
 							id: bootstrapId || undefined,
 						});
 
 						responseData = {
-							success: true,
+							success: lazyResult.started === '1',
 							hash: lazyHash,
 							force,
+							keyInserted: lazyResult.key_inserted === '1',
 						};
 						break;
 					}
@@ -2382,10 +2382,10 @@ export class NanoRPC implements INodeType {
 					}
 
 					case 'resetBootstrap': {
-						await rpc.resetBootstrap();
+						const { success } = await rpc.resetBootstrap();
 
 						responseData = {
-							success: true,
+							success: success === '',
 						};
 						break;
 					}
@@ -2394,7 +2394,7 @@ export class NanoRPC implements INodeType {
 						const status = await rpc.getBootstrapStatus();
 
 						responseData = {
-							status,
+							...status,
 						};
 						break;
 					}
@@ -2409,25 +2409,25 @@ export class NanoRPC implements INodeType {
 						});
 
 						responseData = {
-							tracker,
+							...tracker,
 						};
 						break;
 					}
 
 					case 'clearStats': {
-						await rpc.clearStats();
+						const { success } = await rpc.clearStats();
 
 						responseData = {
-							success: true,
+							success: success === '',
 						};
 						break;
 					}
 
 					case 'clearUnchecked': {
-						await rpc.clearUnchecked();
+						const { success } = await rpc.clearUnchecked();
 
 						responseData = {
-							success: true,
+							success: success === '',
 						};
 						break;
 					}
@@ -2441,7 +2441,7 @@ export class NanoRPC implements INodeType {
 							});
 						}
 
-						const block = await rpc.getUncheckedBlock(uncheckedHash);
+						const { contents: block } = await rpc.getUncheckedBlock(uncheckedHash);
 
 						responseData = {
 							hash: uncheckedHash,
@@ -2465,7 +2465,7 @@ export class NanoRPC implements INodeType {
 					case 'nanoToRawRPC': {
 						const convertAmount = this.getNodeParameter('convertAmount', i) as string;
 
-						const raw = await rpc.nanoToRaw(convertAmount);
+						const { amount: raw } = await rpc.nanoToRaw(convertAmount);
 
 						responseData = {
 							nano: convertAmount,
@@ -2477,7 +2477,7 @@ export class NanoRPC implements INodeType {
 					case 'rawToNanoRPC': {
 						const convertAmount = this.getNodeParameter('convertAmount', i) as string;
 
-						const nano = await rpc.rawToNano(convertAmount);
+						const { amount: nano } = await rpc.rawToNano(convertAmount);
 
 						responseData = {
 							raw: convertAmount,

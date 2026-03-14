@@ -11,6 +11,7 @@ import type {
   ReceivableExistsRPCResponse,
   SendRPCResponse,
   ReceiveRPCResponse,
+  EpochUpgradeRPCResponse,
 } from '../../../types/rpc';
 
 /**
@@ -87,7 +88,7 @@ export async function receivableExists(
   config: INanoRPCConfig,
   hash: string,
   options?: ReceivableExistsOptions
-): Promise<boolean> {
+): Promise<ReceivableExistsRPCResponse> {
   const params: Record<string, unknown> = { hash };
   
   if (options?.includeActive) {
@@ -98,8 +99,7 @@ export async function receivableExists(
     params.include_only_confirmed = false;
   }
   
-  const response = await nanoRPCCall<ReceivableExistsRPCResponse>(context, config, 'receivable_exists', params);
-  return response.exists === '1';
+  return await nanoRPCCall<ReceivableExistsRPCResponse>(context, config, 'receivable_exists', params);
 }
 
 /**
@@ -111,9 +111,8 @@ export async function epochUpgrade(
   epoch: number,
   key: string,
   count?: number
-): Promise<boolean> {
-  await nanoRPCCall(context, config, 'epoch_upgrade', { epoch, key, count });
-  return true;
+): Promise<EpochUpgradeRPCResponse> {
+  return await nanoRPCCall<EpochUpgradeRPCResponse>(context, config, 'epoch_upgrade', { epoch, key, count });
 }
 
 /**
@@ -130,7 +129,7 @@ export async function send(
   amountRaw: string,
   id?: string,
   work?: string
-): Promise<string> {
+): Promise<SendRPCResponse> {
   const params: Record<string, string> = {
     wallet,
     source,
@@ -143,8 +142,7 @@ export async function send(
   if (work) {
     params.work = work;
   }
-  const response = await nanoRPCCall<SendRPCResponse>(context, config, 'send', params);
-  return response.block;
+  return await nanoRPCCall<SendRPCResponse>(context, config, 'send', params);
 }
 
 /**
@@ -158,7 +156,7 @@ export async function receive(
   account: string,
   block: string,
   work?: string
-): Promise<string> {
+): Promise<ReceiveRPCResponse> {
   const params: Record<string, string> = {
     wallet,
     account,
@@ -167,7 +165,6 @@ export async function receive(
   if (work) {
     params.work = work;
   }
-  const response = await nanoRPCCall<ReceiveRPCResponse>(context, config, 'receive', params);
-  return response.block;
+  return await nanoRPCCall<ReceiveRPCResponse>(context, config, 'receive', params);
 }
 

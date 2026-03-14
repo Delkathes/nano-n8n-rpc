@@ -24,7 +24,7 @@ export async function getChain(
   block: string,
   count: number,
   options?: ChainOptions
-): Promise<string[]> {
+): Promise<ChainRPCResponse> {
   const params: Record<string, unknown> = { block, count };
   if (options?.offset !== undefined && options.offset > 0) {
     params.offset = options.offset;
@@ -32,8 +32,7 @@ export async function getChain(
   if (options?.reverse) {
     params.reverse = true;
   }
-  const response = await nanoRPCCall<ChainRPCResponse>(context, config, 'chain', params);
-  return response.blocks;
+  return await nanoRPCCall<ChainRPCResponse>(context, config, 'chain', params);
 }
 
 /**
@@ -44,17 +43,18 @@ export async function getFrontiers(
   config: INanoRPCConfig,
   account: string,
   count: number
-): Promise<Record<string, string>> {
-  const response = await nanoRPCCall<FrontiersRPCResponse>(context, config, 'frontiers', { account, count });
-  return response.frontiers;
+): Promise<FrontiersRPCResponse> {
+  return await nanoRPCCall<FrontiersRPCResponse>(context, config, 'frontiers', { account, count });
 }
 
 /**
  * Get the total frontier block count
  */
-export async function getFrontierCount(context: IExecuteFunctions, config: INanoRPCConfig): Promise<string> {
-  const response = await nanoRPCCall<FrontierCountRPCResponse>(context, config, 'frontier_count');
-  return response.count;
+export async function getFrontierCount(
+  context: IExecuteFunctions,
+  config: INanoRPCConfig,
+): Promise<FrontierCountRPCResponse> {
+  return await nanoRPCCall<FrontierCountRPCResponse>(context, config, 'frontier_count');
 }
 
 /**
@@ -107,7 +107,7 @@ export async function getSuccessors(
   block: string,
   count: number,
   options?: SuccessorsOptions
-): Promise<string[]> {
+): Promise<ChainRPCResponse> {
   const params: Record<string, unknown> = { block, count };
   if (options?.offset !== undefined && options.offset > 0) {
     params.offset = options.offset;
@@ -115,8 +115,7 @@ export async function getSuccessors(
   if (options?.reverse) {
     params.reverse = true;
   }
-  const response = await nanoRPCCall<ChainRPCResponse>(context, config, 'successors', params);
-  return response.blocks;
+  return await nanoRPCCall<ChainRPCResponse>(context, config, 'successors', params);
 }
 
 /**
@@ -127,7 +126,6 @@ export async function getUnopened(
   config: INanoRPCConfig,
   account?: string,
   count?: number
-): Promise<Record<string, string>> {
-  const response = await nanoRPCCall<UnopenedRPCResponse>(context, config, 'unopened', { account, count });
-  return response.accounts;
+): Promise<UnopenedRPCResponse> {
+  return await nanoRPCCall<UnopenedRPCResponse>(context, config, 'unopened', { account, count });
 }

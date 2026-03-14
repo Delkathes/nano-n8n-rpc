@@ -5,16 +5,15 @@ import type {
   WorkGenerateOptions,
   WorkGenerateResponse,
   WorkValidateOptions,
-  WorkValidateResponse,
+  WorkValidateRPCResponse,
   WorkPeersRPCResponse,
 } from '../../../types/rpc';
 
 /**
  * Cancel work generation
  */
-export async function cancelWork(context: IExecuteFunctions, config: INanoRPCConfig, hash: string): Promise<boolean> {
+export async function cancelWork(context: IExecuteFunctions, config: INanoRPCConfig, hash: string): Promise<void> {
   await nanoRPCCall(context, config, 'work_cancel', { hash });
-  return true;
 }
 
 /**
@@ -57,25 +56,22 @@ export async function generateWork(
 /**
  * Add a work peer
  */
-export async function addWorkPeer(context: IExecuteFunctions, config: INanoRPCConfig, address: string, port: number): Promise<boolean> {
+export async function addWorkPeer(context: IExecuteFunctions, config: INanoRPCConfig, address: string, port: number): Promise<void> {
   await nanoRPCCall(context, config, 'work_peer_add', { address, port: port.toString() });
-  return true;
 }
 
 /**
  * Get list of work peers
  */
-export async function getWorkPeers(context: IExecuteFunctions, config: INanoRPCConfig): Promise<string[]> {
-  const response = await nanoRPCCall<WorkPeersRPCResponse>(context, config, 'work_peers');
-  return response.work_peers;
+export async function getWorkPeers(context: IExecuteFunctions, config: INanoRPCConfig): Promise<WorkPeersRPCResponse> {
+  return await nanoRPCCall<WorkPeersRPCResponse>(context, config, 'work_peers');
 }
 
 /**
  * Clear work peers list
  */
-export async function clearWorkPeers(context: IExecuteFunctions, config: INanoRPCConfig): Promise<boolean> {
+export async function clearWorkPeers(context: IExecuteFunctions, config: INanoRPCConfig): Promise<void> {
   await nanoRPCCall(context, config, 'work_peers_clear');
-  return true;
 }
 
 /**
@@ -87,7 +83,7 @@ export async function validateWork(
   work: string,
   hash: string,
   options: WorkValidateOptions = {}
-): Promise<WorkValidateResponse> {
+): Promise<WorkValidateRPCResponse> {
   const params: Record<string, unknown> = { work, hash };
 
   if (options.difficulty) {
@@ -100,19 +96,5 @@ export async function validateWork(
     params.version = options.version;
   }
 
-  const response = await nanoRPCCall<{
-    valid?: string;
-    valid_all: string;
-    valid_receive: string;
-    difficulty: string;
-    multiplier: string;
-  }>(context, config, 'work_validate', params);
-
-  return {
-    valid: response.valid !== undefined ? response.valid === '1' : undefined,
-    validAll: response.valid_all === '1',
-    validReceive: response.valid_receive === '1',
-    difficulty: response.difficulty,
-    multiplier: parseFloat(response.multiplier),
-  };
+  return await nanoRPCCall<WorkValidateRPCResponse>(context, config, 'work_validate', params);
 }

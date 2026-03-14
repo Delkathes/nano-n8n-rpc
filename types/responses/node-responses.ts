@@ -413,12 +413,10 @@ export interface KeepaliveResponse {
 }
 
 export interface GetNodeIdResponse {
-  nodeId: {
-    private: string;
-    public: string;
-    as_account: string;
-    node_id: string;
-  };
+  private: string;
+  public: string;
+  as_account: string;
+  node_id: string;
 }
 
 export interface GetPeersResponse {
@@ -443,7 +441,7 @@ export interface RepublishResponse {
   count: number;
   sources: number;
   destinations: number;
-  result: unknown;
+  blocks: string[];
 }
 
 export interface GetTelemetryResponse {
@@ -675,6 +673,7 @@ export interface BootstrapLazyResponse {
   success: boolean;
   hash: string;
   force: boolean;
+  keyInserted: boolean;
 }
 
 export interface GetBootstrapPrioritiesResponse {
@@ -689,39 +688,35 @@ export interface ResetBootstrapResponse {
 }
 
 export interface GetBootstrapStatusResponse {
-  status: {
-    bootstrap_threads: string;
-    running_attempts_count: string;
-    total_attempts_count: string;
-    connections: {
-      clients: string;
-      connections: string;
-      idle: string;
-      target_connections: string;
-      pulls: string;
-    };
-    attempts: {
-      id: string;
-      mode: string;
-      started: string;
-      pulling: string;
-      total_blocks: string;
-      requeued_pulls: string;
-      frontier_pulls: string;
-      account_count: string;
-    }[];
-  }
+  bootstrap_threads: string;
+  running_attempts_count: string;
+  total_attempts_count: string;
+  connections: {
+    clients: string;
+    connections: string;
+    idle: string;
+    target_connections: string;
+    pulls: string;
+  };
+  attempts: {
+    id: string;
+    mode: string;
+    started: string;
+    pulling: string;
+    total_blocks: string;
+    requeued_pulls: string;
+    frontier_pulls: string;
+    account_count: string;
+  }[];
 }
 
 export interface GetDatabaseTxnTrackerResponse {
-  tracker: {
-    txn_tracking: {
-      thread: string;
-      time_held_open: string;
-      write: string;
-      stacktrace?: string[];
-    }[];
-  }
+  txn_tracking: {
+    thread: string;
+    time_held_open: string;
+    write: string;
+    stacktrace?: string[];
+  }[];
 }
 
 export interface GetStatsResponse {
@@ -769,12 +764,12 @@ export interface GetUncheckedKeysResponse {
 
 // ============ Conversion Responses ============
 
-export interface NanoToRawRPCResponse {
+export interface NanoToRawResponse {
   nano: string;
   raw: string;
 }
 
-export interface RawToNanoRPCResponse {
+export interface RawToNanoResponse {
   raw: string;
   nano: string;
 }
@@ -910,5 +905,5 @@ export type NanoOperationResponse =
   | GetUncheckedBlockResponse
   | GetUncheckedKeysResponse
   // Conversion responses
-  | NanoToRawRPCResponse
-  | RawToNanoRPCResponse;
+  | NanoToRawResponse
+  | RawToNanoResponse;

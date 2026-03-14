@@ -36,7 +36,21 @@ export interface WorkGenerateResponse {
   hash: string;
 }
 
-/** Response from work validation */
+/** Raw RPC response from work_validate */
+export interface WorkValidateRPCResponse {
+  /** Valid at the given difficulty (only when difficulty/multiplier provided) */
+  valid?: string;
+  /** Valid for all block types (v21.0+) */
+  valid_all: string;
+  /** Valid for receive blocks (v21.0+) */
+  valid_receive: string;
+  /** Difficulty of the work */
+  difficulty: string;
+  /** Multiplier from base difficulty */
+  multiplier: string;
+}
+
+/** Processed response from work validation */
 export interface WorkValidateResponse {
   /** Valid at the given difficulty (only when difficulty/multiplier provided) */
   valid?: boolean;
