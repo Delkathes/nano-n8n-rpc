@@ -69,7 +69,6 @@ export async function nanoRPCCall<T = INanoRPCResponse>(
 ): Promise<T> {
 	const timeoutMs = config.timeoutMs ?? DEFAULT_TIMEOUT_MS;
 	const maxRetries = config.maxRetries ?? DEFAULT_MAX_RETRIES;
-	const retryDelayMs = config.retryDelayMs ?? DEFAULT_RETRY_DELAY_MS;
 
 	const requestBody = {
 		action,
@@ -121,7 +120,7 @@ export async function nanoRPCCall<T = INanoRPCResponse>(
 				context.getNode(),
 				`Nano RPC call failed for action "${action}": ${message}`,
 				{
-					description: `Attempt ${attempt + 1}/${maxRetries + 1} | URL: ${config.rpcUrl} | timeoutMs=${timeoutMs} | retryDelayMs=${retryDelayMs} | Params: ${JSON.stringify(redactParams(params))}`,
+					description: `Attempt ${attempt + 1}/${maxRetries + 1} | URL: ${config.rpcUrl} | timeoutMs=${timeoutMs} | Params: ${JSON.stringify(redactParams(params))}`,
 					itemIndex: 0,
 				},
 			);

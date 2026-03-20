@@ -353,11 +353,6 @@ export interface WalletLockedResponse {
 	locked: boolean;
 }
 
-export interface WalletPendingResponse {
-	wallet: string;
-	blocks: Record<string, unknown>;
-}
-
 export interface WalletReceivableResponse {
 	wallet: string;
 	blocks: Record<string, unknown>;
@@ -833,7 +828,6 @@ export type NanoOperationResponse =
 	| WalletLedgerResponse
 	| WalletLockResponse
 	| WalletLockedResponse
-	| WalletPendingResponse
 	| WalletReceivableResponse
 	| WalletRepresentativeResponse
 	| WalletRepresentativeSetResponse

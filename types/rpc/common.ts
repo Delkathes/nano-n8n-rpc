@@ -51,6 +51,4 @@ export interface INanoRPCConfig {
 	timeoutMs?: number;
 	/** Number of retries for transient failures (default: 2) */
 	maxRetries?: number;
-	/** Base delay in milliseconds between retries (default: 300) */
-	retryDelayMs?: number;
 }
