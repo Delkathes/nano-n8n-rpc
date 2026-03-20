@@ -123,12 +123,12 @@ export class NanoApi implements ICredentialType {
 		type: 'generic',
 		properties: {
 			headers: {
-				'={{$credentials.headerName || "Authorization"}}':
-					'={{$credentials.authMethod === "apiKey" ? $credentials.apiKey : undefined}}',
+				'={{ $credentials.authMethod === "apiKey" ? ($credentials.headerName || "Authorization") : undefined }}':
+					'={{ $credentials.authMethod === "apiKey" ? $credentials.apiKey : undefined }}',
 			},
 			auth: {
-				username: '={{$credentials.authMethod === "basic" ? $credentials.username : undefined}}',
-				password: '={{$credentials.authMethod === "basic" ? $credentials.password : undefined}}',
+				username: '={{ $credentials.authMethod === "basic" ? $credentials.username : undefined }}',
+				password: '={{ $credentials.authMethod === "basic" ? $credentials.password : undefined }}',
 			},
 		},
 	};
