@@ -14,16 +14,17 @@ export const keyNanoRPCParameterProperties: INodeProperties[] = [
 			{
 				name: 'Private Key',
 				value: 'key',
-				description: 'Sign with a private key',
+				description: 'Sign with a raw private key (bypasses wallet isolation)',
 			},
 			{
 				name: 'Wallet Account',
 				value: 'wallet',
-				description: 'Sign with an account from a wallet',
+				description: 'Sign using an account held in a wallet (requires wallet ID)',
 			},
 		],
 		default: 'key',
-		description: 'Method to use for signing (v18.0+)',
+		description:
+			'How to provide signing credentials (v18.0+). Either a private key or a wallet account is required.',
 	},
 	{
 		displayName:
@@ -51,7 +52,8 @@ export const keyNanoRPCParameterProperties: INodeProperties[] = [
 		},
 		default: '',
 		placeholder: '64-character hex string',
-		description: 'Private key for signing',
+		description:
+			'Private key to sign with (64 hex characters). Required when Sign Method is Private Key.',
 	},
 	{
 		displayName: 'Sign Account',
@@ -66,7 +68,8 @@ export const keyNanoRPCParameterProperties: INodeProperties[] = [
 		},
 		default: '',
 		placeholder: 'nano_1abc...',
-		description: 'Account in wallet to sign with',
+		description:
+			'Nano account address held in the wallet. Required when Sign Method is Wallet Account. Uses the credential Wallet ID by default, or the Wallet ID field below if provided.',
 	},
 	{
 		displayName: 'Sign Input',
@@ -81,16 +84,17 @@ export const keyNanoRPCParameterProperties: INodeProperties[] = [
 			{
 				name: 'Block',
 				value: 'block',
-				description: 'Sign a block (returns signed block)',
+				description: 'Sign a block (returns the signed block)',
 			},
 			{
 				name: 'Hash',
 				value: 'hash',
-				description: 'Sign a hash directly (requires rpc.enable_sign_hash config)',
+				description: 'Sign a raw block hash directly (requires rpc.enable_sign_hash on the node)',
 			},
 		],
 		default: 'block',
-		description: 'What to sign - a block or a hash directly',
+		description:
+			'What to sign. Either a block JSON object (recommended) or a raw block hash string.',
 	},
 	{
 		displayName: 'Block to Sign',
@@ -104,7 +108,8 @@ export const keyNanoRPCParameterProperties: INodeProperties[] = [
 			},
 		},
 		default: '{}',
-		description: 'Block JSON to sign. The signature field will be updated in the response.',
+		description:
+			'Block JSON to sign. Must include type, account, previous, representative, balance, and link. The signature field will be computed and added to the response.',
 	},
 	{
 		displayName: 'Hash to Sign',
@@ -118,8 +123,9 @@ export const keyNanoRPCParameterProperties: INodeProperties[] = [
 			},
 		},
 		default: '',
-		placeholder: 'Hash to sign',
-		description: 'Hash to sign directly (requires rpc.enable_sign_hash config on the node)',
+		placeholder: '64-character hex hash',
+		description:
+			'Raw block hash to sign directly (64 hex characters). Requires rpc.enable_sign_hash to be enabled on the Nano node.',
 	},
 	{
 		displayName:
