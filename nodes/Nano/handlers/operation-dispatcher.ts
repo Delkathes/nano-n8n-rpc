@@ -13,6 +13,8 @@ import {
 	isValidRawAmount,
 	isValidWalletId,
 	isValidWorkValue,
+	validateBlockContents,
+	validateSignOptions,
 } from '../../../utils/validation';
 
 import type * as rpcTypes from '../../../types';
@@ -424,7 +426,19 @@ export async function dispatchNanoOperation(params: {
 			}
 
 			case 'processBlock': {
-				const blockJson = this.getNodeParameter('blockJson', i) as rpcTypes.BlockContents;
+				const blockJsonRaw = this.getNodeParameter('blockJson', i);
+				const blockJson =
+					typeof blockJsonRaw === 'string' ? JSON.parse(blockJsonRaw) : blockJsonRaw;
+
+				const blockErrors = validateBlockContents(blockJson);
+				if (blockErrors.length > 0) {
+					throw new NodeOperationError(
+						this.getNode(),
+						`Invalid block JSON: ${blockErrors.join('; ')}`,
+						{ itemIndex: i },
+					);
+				}
+
 				const subtype = this.getNodeParameter('subtype', i, 'send') as rpcTypes.BlockSubtype;
 				const force = this.getNodeParameter('processForce', i, false) as boolean;
 				const asyncProcess = this.getNodeParameter('processAsync', i, false) as boolean;
@@ -1745,14 +1759,23 @@ export async function dispatchNanoOperation(params: {
 					options.version = workVersion;
 				}
 				if (workBlockJson) {
+					let parsed: unknown;
 					try {
-						options.block =
-							typeof workBlockJson === 'string' ? JSON.parse(workBlockJson) : workBlockJson;
+						parsed = typeof workBlockJson === 'string' ? JSON.parse(workBlockJson) : workBlockJson;
 					} catch {
 						throw new NodeOperationError(this.getNode(), 'Invalid JSON in Block field', {
 							itemIndex: i,
 						});
 					}
+					const blockErrors = validateBlockContents(parsed);
+					if (blockErrors.length > 0) {
+						throw new NodeOperationError(
+							this.getNode(),
+							`Invalid block JSON: ${blockErrors.join('; ')}`,
+							{ itemIndex: i },
+						);
+					}
+					options.block = parsed;
 				}
 
 				const workResult = await rpc.generateWork(blockHash, options);
@@ -1825,18 +1848,36 @@ export async function dispatchNanoOperation(params: {
 				}
 
 				if (signInput === 'block') {
-					const signBlockJson = this.getNodeParameter('signBlock', i) as string;
+					const signBlockJson = this.getNodeParameter('signBlock', i);
+					let parsed: unknown;
 					try {
-						signOptions.block =
-							typeof signBlockJson === 'string' ? JSON.parse(signBlockJson) : signBlockJson;
+						parsed = typeof signBlockJson === 'string' ? JSON.parse(signBlockJson) : signBlockJson;
 					} catch {
 						throw new NodeOperationError(this.getNode(), 'Invalid JSON in Block to Sign field', {
 							itemIndex: i,
 						});
 					}
+					const blockErrors = validateBlockContents(parsed);
+					if (blockErrors.length > 0) {
+						throw new NodeOperationError(
+							this.getNode(),
+							`Invalid block JSON: ${blockErrors.join('; ')}`,
+							{ itemIndex: i },
+						);
+					}
+					signOptions.block = parsed;
 				} else {
 					const hashToSign = this.getNodeParameter('hashToSign', i) as string;
 					signOptions.hash = hashToSign;
+				}
+
+				const signOptionErrors = validateSignOptions(signOptions);
+				if (signOptionErrors.length > 0) {
+					throw new NodeOperationError(
+						this.getNode(),
+						`Invalid sign options: ${signOptionErrors.join('; ')}`,
+						{ itemIndex: i },
+					);
 				}
 
 				const signResult = await rpc.signBlock(signOptions);
@@ -2150,19 +2191,29 @@ export async function dispatchNanoOperation(params: {
 			}
 
 			case 'getBlockHash': {
-				const blockParamsStr = this.getNodeParameter('blockParams', i) as string;
+				const blockParamsRaw = this.getNodeParameter('blockParams', i);
 				const jsonBlock = this.getNodeParameter('jsonBlock', i, true) as boolean;
 
-				let blockParams;
+				let blockParams: unknown;
 				try {
-					blockParams = JSON.parse(blockParamsStr);
+					blockParams =
+						typeof blockParamsRaw === 'string' ? JSON.parse(blockParamsRaw) : blockParamsRaw;
 				} catch {
 					throw new NodeOperationError(this.getNode(), 'Invalid block parameters JSON', {
 						itemIndex: i,
 					});
 				}
 
-				const { hash } = await rpc.getBlockHash(blockParams, jsonBlock);
+				const blockErrors = validateBlockContents(blockParams);
+				if (blockErrors.length > 0) {
+					throw new NodeOperationError(
+						this.getNode(),
+						`Invalid block parameters: ${blockErrors.join('; ')}`,
+						{ itemIndex: i },
+					);
+				}
+
+				const { hash } = await rpc.getBlockHash(blockParams as rpcTypes.BlockContents, jsonBlock);
 
 				responseData = {
 					hash,
