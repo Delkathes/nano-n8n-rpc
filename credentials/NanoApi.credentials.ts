@@ -105,6 +105,18 @@ export class NanoApi implements ICredentialType {
 			description: 'Default Nano account to send from',
 			placeholder: 'nano_1abc...',
 		},
+		{
+			displayName: 'Webhook Secret',
+			name: 'webhookSecret',
+			type: 'string',
+			typeOptions: {
+				password: true,
+			},
+			default: '',
+			description:
+				"Shared secret for HMAC-SHA256 verification of incoming webhook payloads. Must match the value configured in your Nano node's callback. Leave empty to skip verification (not recommended for public webhooks).",
+			placeholder: 'your-secret-string',
+		},
 	];
 
 	authenticate: IAuthenticateGeneric = {

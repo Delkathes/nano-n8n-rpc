@@ -9,6 +9,8 @@ import {
 	NodeConnectionTypes,
 } from 'n8n-workflow';
 
+import { createHmac, timingSafeEqual } from 'crypto';
+
 import { rawToNano } from '../../utils/conversions';
 
 import type { BlockContents } from '../../types';
@@ -195,10 +197,22 @@ export class NanoTrigger implements INodeType {
 		// Get node parameters
 		const filterOptions = this.getNodeParameter('filterOptions', {}) as NanoFilterOptions;
 		const advancedOptions = this.getNodeParameter('advancedOptions', {}) as NanoAdvancedOptions;
+		const credentials = await this.getCredentials('nanoApi');
+		const webhookSecret = credentials.webhookSecret as string | undefined;
 
 		// Default advanced options
 		const includeBlock = advancedOptions.includeBlock !== false;
 		const deduplicateHash = advancedOptions.deduplicateHash !== false;
+
+		// Verify webhook signature if a secret is configured
+		if (webhookSecret && webhookSecret.length > 0) {
+			const isValid = verifyWebhookSignature(this, webhookSecret);
+			if (!isValid) {
+				throw new NodeOperationError(this.getNode(), 'Invalid webhook signature', {
+					type: 'WebhookError',
+				});
+			}
+		}
 
 		// Parse incoming request data
 		const bodyData = parseRequestBody(this);
@@ -301,6 +315,38 @@ interface NanoWebhookData extends IDataObject {
 	block?: BlockContents;
 	signatureValid?: boolean;
 	accountInfo?: NanoAccountInfo | null;
+}
+
+/**
+ * Verifies the HMAC-SHA256 signature of the incoming webhook payload.
+ * The Nano node sends the signature in the nano_callback_auth header (hex-encoded).
+ * Returns true if verification passes or no header is present; false otherwise.
+ */
+function verifyWebhookSignature(context: IWebhookFunctions, secret: string): boolean {
+	try {
+		const req = context.getRequestObject();
+		const authHeader: string | undefined = req.headers?.nano_callback_auth as string | undefined;
+
+		if (!authHeader) {
+			return false;
+		}
+
+		const rawBody = req.rawBody;
+		if (typeof rawBody !== 'string' || rawBody.length === 0) {
+			return false;
+		}
+
+		const expectedSig = Buffer.from(authHeader, 'hex');
+		const computedHmac = createHmac('sha256', secret).update(rawBody, 'utf8').digest();
+
+		if (expectedSig.length !== computedHmac.length) {
+			return false;
+		}
+
+		return timingSafeEqual(expectedSig, computedHmac);
+	} catch {
+		return false;
+	}
 }
 
 /**
