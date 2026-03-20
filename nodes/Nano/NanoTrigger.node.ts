@@ -294,7 +294,7 @@ interface NanoCallbackPayload {
  * Account info response from RPC
  */
 interface NanoAccountInfo {
-	balance: bigint;
+	balance: string;
 	balanceRaw: string;
 	representative: string;
 	blockCount: string;
@@ -440,7 +440,7 @@ async function fetchAccountInfo(
 		});
 
 		return {
-			balance: BigInt(rawToNano(accountInfo.balance)),
+			balance: rawToNano(accountInfo.balance),
 			balanceRaw: accountInfo.balance,
 			representative: accountInfo.representative,
 			blockCount: accountInfo.block_count,
