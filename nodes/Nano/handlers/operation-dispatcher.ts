@@ -1807,18 +1807,9 @@ export async function dispatchNanoOperation(params: {
 				break;
 			}
 
-			case 'sign': {
-				const manualWalletId = this.getNodeParameter('manualWalletId', i) as string;
+			case 'signBlock': {
 				const signMethod = this.getNodeParameter('signMethod', i, 'key') as string;
 				const signInput = this.getNodeParameter('signInput', i, 'block') as string;
-
-				const walletId = manualWalletId.length > 0 ? manualWalletId : credentialsWalletId;
-
-				if (!isValidWalletId(walletId)) {
-					throw new NodeOperationError(this.getNode(), `Invalid wallet ID: ${walletId}`, {
-						itemIndex: i,
-					});
-				}
 
 				const signOptions: Record<string, unknown> = {};
 
@@ -1826,6 +1817,8 @@ export async function dispatchNanoOperation(params: {
 					const signPrivateKey = this.getNodeParameter('signPrivateKey', i) as string;
 					signOptions.key = signPrivateKey;
 				} else {
+					const manualWalletId = this.getNodeParameter('manualWalletId', i, '') as string;
+					const walletId = manualWalletId.length > 0 ? manualWalletId : credentialsWalletId;
 					signOptions.wallet = walletId;
 					const signAccount = this.getNodeParameter('signAccount', i) as string;
 					signOptions.account = signAccount;
@@ -1843,13 +1836,6 @@ export async function dispatchNanoOperation(params: {
 					}
 				} else {
 					const hashToSign = this.getNodeParameter('hashToSign', i) as string;
-
-					if (!isValidBlockHash(hashToSign)) {
-						throw new NodeOperationError(this.getNode(), `Invalid block hash: ${hashToSign}`, {
-							itemIndex: i,
-						});
-					}
-
 					signOptions.hash = hashToSign;
 				}
 

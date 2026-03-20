@@ -120,7 +120,7 @@ export {
 } from './work';
 
 // Re-export key operations
-export { getDeterministicKey, createKey, expandKey, sign, signBlock } from './keys';
+export { getDeterministicKey, createKey, expandKey, signBlock } from './keys';
 
 // Re-export representative operations
 export { getDelegators, getDelegatorsCount } from './representative';

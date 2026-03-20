@@ -712,10 +712,10 @@ export const coreNanoRPCProperties: INodeProperties[] = [
 				action: 'Create new keypair',
 			},
 			{
-				name: 'Sign',
-				value: 'sign',
-				description: 'Sign a hash using a private key',
-				action: 'Sign hash',
+				name: 'Sign Block',
+				value: 'signBlock',
+				description: 'Sign a block or hash using a private key or wallet account (v18.0+)',
+				action: 'Sign block or hash',
 			},
 			{
 				name: 'Expand Key',

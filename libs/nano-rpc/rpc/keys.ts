@@ -45,19 +45,6 @@ export async function expandKey(
 }
 
 /**
- * Sign a block hash with a private key
- * @deprecated Use signBlock for more options
- */
-export async function sign(
-	context: IExecuteFunctions,
-	config: INanoRPCConfig,
-	key: string,
-	hash: string,
-): Promise<SignRPCResponse> {
-	return await nanoRPCCall<SignRPCResponse>(context, config, 'sign', { key, hash });
-}
-
-/**
  * Sign a block or hash (v18.0+)
  * Can sign with private key or wallet+account
  * When signing a block, returns the block with updated signature

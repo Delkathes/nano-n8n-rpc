@@ -495,6 +495,7 @@ export const walletNanoRPCParameterProperties: INodeProperties[] = [
 					'walletRepresentativeSet',
 					'passwordValid',
 					'walletContains',
+					'signBlock',
 				],
 			},
 		},

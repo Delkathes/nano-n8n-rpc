@@ -181,7 +181,6 @@ export function createNanoRPC(context: IExecuteFunctions, config: rpcTypes.INano
 			rpc.getDeterministicKey(context, config, seed, index),
 		createKey: () => rpc.createKey(context, config),
 		expandKey: (key: string) => rpc.expandKey(context, config, key),
-		sign: (key: string, hash: string) => rpc.sign(context, config, key, hash),
 		signBlock: (options: rpcTypes.SignOptions) => rpc.signBlock(context, config, options),
 
 		// Representative Operations

@@ -2,39 +2,12 @@ import type { INodeProperties } from 'n8n-workflow';
 
 export const keyNanoRPCParameterProperties: INodeProperties[] = [
 	{
-		displayName:
-			'Security notice: signing with a raw private key bypasses wallet isolation. Prefer wallet-based signing for long-lived workflows and rotate the key immediately if it may have been exposed.',
-		name: 'signPrivateKeySecurityNotice',
-		type: 'notice',
-		displayOptions: {
-			show: {
-				operation: ['sign'],
-				signMethod: ['key'],
-			},
-		},
-		default: '',
-	},
-	{
-		displayName: 'Wallet ID (Manual)',
-		name: 'manualWalletId',
-		type: 'string',
-		displayOptions: {
-			show: {
-				operation: ['sign'],
-			},
-		},
-		default: '',
-		placeholder: 'Wallet ID',
-		description:
-			'Manually specify the wallet ID you sign from (optional), default to credential wallet',
-	},
-	{
 		displayName: 'Sign Method',
 		name: 'signMethod',
 		type: 'options',
 		displayOptions: {
 			show: {
-				operation: ['sign'],
+				operation: ['signBlock'],
 			},
 		},
 		options: [
@@ -53,12 +26,55 @@ export const keyNanoRPCParameterProperties: INodeProperties[] = [
 		description: 'Method to use for signing (v18.0+)',
 	},
 	{
+		displayName:
+			'Security notice: signing with a raw private key bypasses wallet isolation. Prefer wallet-based signing for long-lived workflows and rotate the key immediately if it may have been exposed.',
+		name: 'signPrivateKeySecurityNotice',
+		type: 'notice',
+		displayOptions: {
+			show: {
+				operation: ['signBlock'],
+				signMethod: ['key'],
+			},
+		},
+		default: '',
+	},
+	{
+		displayName: 'Private Key',
+		name: 'signPrivateKey',
+		type: 'string',
+		required: true,
+		displayOptions: {
+			show: {
+				operation: ['signBlock'],
+				signMethod: ['key'],
+			},
+		},
+		default: '',
+		placeholder: '64-character hex string',
+		description: 'Private key for signing',
+	},
+	{
+		displayName: 'Sign Account',
+		name: 'signAccount',
+		type: 'string',
+		required: true,
+		displayOptions: {
+			show: {
+				operation: ['signBlock'],
+				signMethod: ['wallet'],
+			},
+		},
+		default: '',
+		placeholder: 'nano_1abc...',
+		description: 'Account in wallet to sign with',
+	},
+	{
 		displayName: 'Sign Input',
 		name: 'signInput',
 		type: 'options',
 		displayOptions: {
 			show: {
-				operation: ['sign'],
+				operation: ['signBlock'],
 			},
 		},
 		options: [
@@ -75,6 +91,35 @@ export const keyNanoRPCParameterProperties: INodeProperties[] = [
 		],
 		default: 'block',
 		description: 'What to sign - a block or a hash directly',
+	},
+	{
+		displayName: 'Block to Sign',
+		name: 'signBlock',
+		type: 'json',
+		required: true,
+		displayOptions: {
+			show: {
+				operation: ['signBlock'],
+				signInput: ['block'],
+			},
+		},
+		default: '{}',
+		description: 'Block JSON to sign. The signature field will be updated in the response.',
+	},
+	{
+		displayName: 'Hash to Sign',
+		name: 'hashToSign',
+		type: 'string',
+		required: true,
+		displayOptions: {
+			show: {
+				operation: ['signBlock'],
+				signInput: ['hash'],
+			},
+		},
+		default: '',
+		placeholder: 'Hash to sign',
+		description: 'Hash to sign directly (requires rpc.enable_sign_hash config on the node)',
 	},
 	{
 		displayName:
@@ -101,65 +146,6 @@ export const keyNanoRPCParameterProperties: INodeProperties[] = [
 		default: '',
 		placeholder: '64-character hex string',
 		description: 'Private key for expanding',
-	},
-	{
-		displayName: 'Private Key',
-		name: 'signPrivateKey',
-		type: 'string',
-		required: true,
-		displayOptions: {
-			show: {
-				operation: ['sign'],
-				signMethod: ['key'],
-			},
-		},
-		default: '',
-		placeholder: '64-character hex string',
-		description: 'Private key for signing',
-	},
-	{
-		displayName: 'Sign Account',
-		name: 'signAccount',
-		type: 'string',
-		required: true,
-		displayOptions: {
-			show: {
-				operation: ['sign'],
-				signMethod: ['wallet'],
-			},
-		},
-		default: '',
-		placeholder: 'nano_1abc...',
-		description: 'Account in wallet to sign with',
-	},
-	{
-		displayName: 'Block to Sign',
-		name: 'signBlock',
-		type: 'json',
-		required: true,
-		displayOptions: {
-			show: {
-				operation: ['sign'],
-				signInput: ['block'],
-			},
-		},
-		default: '{}',
-		description: 'Block JSON to sign. The signature field will be updated in the response.',
-	},
-	{
-		displayName: 'Hash to Sign',
-		name: 'hashToSign',
-		type: 'string',
-		required: true,
-		displayOptions: {
-			show: {
-				operation: ['sign'],
-				signInput: ['hash'],
-			},
-		},
-		default: '',
-		placeholder: 'Hash to sign',
-		description: 'Hash to sign directly (requires rpc.enable_sign_hash config on the node)',
 	},
 	{
 		displayName:
