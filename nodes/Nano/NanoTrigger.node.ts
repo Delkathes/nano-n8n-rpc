@@ -179,15 +179,19 @@ export class NanoTrigger implements INodeType {
 	webhookMethods = {
 		default: {
 			async checkExists(this: IHookFunctions): Promise<boolean> {
-				return false;
+				const staticData = this.getWorkflowStaticData('node');
+				return !!(staticData as Record<string, unknown>).webhookRegistered;
 			},
 
 			async create(this: IHookFunctions): Promise<boolean> {
+				const staticData = this.getWorkflowStaticData('node');
+				(staticData as Record<string, unknown>).webhookRegistered = true;
 				return true;
 			},
 
 			async delete(this: IHookFunctions): Promise<boolean> {
-				// Static data is automatically cleaned up by n8n
+				const staticData = this.getWorkflowStaticData('node');
+				delete (staticData as Record<string, unknown>).webhookRegistered;
 				return true;
 			},
 		},
