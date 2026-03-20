@@ -173,12 +173,6 @@ export interface PendingBlock {
 	source: string;
 }
 
-export interface PendingResponse {
-	account: string;
-	pendingCount: number;
-	pendingBlocks: PendingBlock[];
-}
-
 export interface ReceivableResponse {
 	account: string;
 	receivable: Record<string, unknown>;
@@ -807,7 +801,6 @@ export type NanoOperationResponse =
 	// Transaction responses
 	| SendPaymentResponse
 	| ReceiveResponse
-	| PendingResponse
 	| ReceivableResponse
 	| ReceivableExistsResponse
 	| ProcessBlockResponse

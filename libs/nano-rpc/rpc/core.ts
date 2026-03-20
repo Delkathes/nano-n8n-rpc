@@ -43,16 +43,7 @@ function shouldRetry(error: unknown): boolean {
 }
 
 function redactParams(input: Record<string, unknown>): Record<string, unknown> {
-	const sensitiveKeys = new Set([
-		'key',
-		'private_key',
-		'seed',
-		'password',
-		'wallet',
-		'signature',
-		'block',
-		'json',
-	]);
+	const sensitiveKeys = new Set(['key', 'private_key', 'seed', 'password']);
 
 	const result: Record<string, unknown> = {};
 
