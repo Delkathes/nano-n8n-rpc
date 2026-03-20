@@ -1,15 +1,15 @@
 import type { IExecuteFunctions } from 'n8n-workflow';
 import { nanoRPCCall } from './core';
 import type {
-  INanoRPCConfig,
-  LedgerRPCResponse,
-  ChainOptions,
-  LedgerOptions,
-  SuccessorsOptions,
-  ChainRPCResponse,
-  FrontiersRPCResponse,
-  FrontierCountRPCResponse,
-  UnopenedRPCResponse,
+	INanoRPCConfig,
+	LedgerRPCResponse,
+	ChainOptions,
+	LedgerOptions,
+	SuccessorsOptions,
+	ChainRPCResponse,
+	FrontiersRPCResponse,
+	FrontierCountRPCResponse,
+	UnopenedRPCResponse,
 } from '../../../types/rpc';
 
 /**
@@ -19,42 +19,42 @@ import type {
  * @param options - Optional parameters for offset and reverse
  */
 export async function getChain(
-  context: IExecuteFunctions,
-  config: INanoRPCConfig,
-  block: string,
-  count: number,
-  options?: ChainOptions
+	context: IExecuteFunctions,
+	config: INanoRPCConfig,
+	block: string,
+	count: number,
+	options?: ChainOptions,
 ): Promise<ChainRPCResponse> {
-  const params: Record<string, unknown> = { block, count };
-  if (options?.offset !== undefined && options.offset > 0) {
-    params.offset = options.offset;
-  }
-  if (options?.reverse) {
-    params.reverse = true;
-  }
-  return await nanoRPCCall<ChainRPCResponse>(context, config, 'chain', params);
+	const params: Record<string, unknown> = { block, count };
+	if (options?.offset !== undefined && options.offset > 0) {
+		params.offset = options.offset;
+	}
+	if (options?.reverse) {
+		params.reverse = true;
+	}
+	return await nanoRPCCall<ChainRPCResponse>(context, config, 'chain', params);
 }
 
 /**
  * Get frontier (head) blocks for accounts
  */
 export async function getFrontiers(
-  context: IExecuteFunctions,
-  config: INanoRPCConfig,
-  account: string,
-  count: number
+	context: IExecuteFunctions,
+	config: INanoRPCConfig,
+	account: string,
+	count: number,
 ): Promise<FrontiersRPCResponse> {
-  return await nanoRPCCall<FrontiersRPCResponse>(context, config, 'frontiers', { account, count });
+	return await nanoRPCCall<FrontiersRPCResponse>(context, config, 'frontiers', { account, count });
 }
 
 /**
  * Get the total frontier block count
  */
 export async function getFrontierCount(
-  context: IExecuteFunctions,
-  config: INanoRPCConfig,
+	context: IExecuteFunctions,
+	config: INanoRPCConfig,
 ): Promise<FrontierCountRPCResponse> {
-  return await nanoRPCCall<FrontierCountRPCResponse>(context, config, 'frontier_count');
+	return await nanoRPCCall<FrontierCountRPCResponse>(context, config, 'frontier_count');
 }
 
 /**
@@ -63,36 +63,36 @@ export async function getFrontierCount(
  * @param options - Optional parameters for filtering and additional data
  */
 export async function getLedger(
-  context: IExecuteFunctions,
-  config: INanoRPCConfig,
-  account: string,
-  options?: LedgerOptions
+	context: IExecuteFunctions,
+	config: INanoRPCConfig,
+	account: string,
+	options?: LedgerOptions,
 ): Promise<LedgerRPCResponse> {
-  const params: Record<string, unknown> = { account };
+	const params: Record<string, unknown> = { account };
 
-  if (options?.count !== undefined) {
-    params.count = options.count;
-  }
-  if (options?.representative) {
-    params.representative = true;
-  }
-  if (options?.weight) {
-    params.weight = true;
-  }
-  if (options?.receivable) {
-    params.receivable = true;
-  }
-  if (options?.modifiedSince !== undefined && options.modifiedSince > 0) {
-    params.modified_since = options.modifiedSince;
-  }
-  if (options?.sorting) {
-    params.sorting = true;
-  }
-  if (options?.threshold) {
-    params.threshold = options.threshold;
-  }
+	if (options?.count !== undefined) {
+		params.count = options.count;
+	}
+	if (options?.representative) {
+		params.representative = true;
+	}
+	if (options?.weight) {
+		params.weight = true;
+	}
+	if (options?.receivable) {
+		params.receivable = true;
+	}
+	if (options?.modifiedSince !== undefined && options.modifiedSince > 0) {
+		params.modified_since = options.modifiedSince;
+	}
+	if (options?.sorting) {
+		params.sorting = true;
+	}
+	if (options?.threshold) {
+		params.threshold = options.threshold;
+	}
 
-  return await nanoRPCCall<LedgerRPCResponse>(context, config, 'ledger', params);
+	return await nanoRPCCall<LedgerRPCResponse>(context, config, 'ledger', params);
 }
 
 /**
@@ -102,30 +102,30 @@ export async function getLedger(
  * @param options - Optional parameters for offset and reverse
  */
 export async function getSuccessors(
-  context: IExecuteFunctions,
-  config: INanoRPCConfig,
-  block: string,
-  count: number,
-  options?: SuccessorsOptions
+	context: IExecuteFunctions,
+	config: INanoRPCConfig,
+	block: string,
+	count: number,
+	options?: SuccessorsOptions,
 ): Promise<ChainRPCResponse> {
-  const params: Record<string, unknown> = { block, count };
-  if (options?.offset !== undefined && options.offset > 0) {
-    params.offset = options.offset;
-  }
-  if (options?.reverse) {
-    params.reverse = true;
-  }
-  return await nanoRPCCall<ChainRPCResponse>(context, config, 'successors', params);
+	const params: Record<string, unknown> = { block, count };
+	if (options?.offset !== undefined && options.offset > 0) {
+		params.offset = options.offset;
+	}
+	if (options?.reverse) {
+		params.reverse = true;
+	}
+	return await nanoRPCCall<ChainRPCResponse>(context, config, 'successors', params);
 }
 
 /**
  * Get accounts that have not yet been opened
  */
 export async function getUnopened(
-  context: IExecuteFunctions,
-  config: INanoRPCConfig,
-  account?: string,
-  count?: number
+	context: IExecuteFunctions,
+	config: INanoRPCConfig,
+	account?: string,
+	count?: number,
 ): Promise<UnopenedRPCResponse> {
-  return await nanoRPCCall<UnopenedRPCResponse>(context, config, 'unopened', { account, count });
+	return await nanoRPCCall<UnopenedRPCResponse>(context, config, 'unopened', { account, count });
 }

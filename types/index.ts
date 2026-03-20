@@ -13,4 +13,4 @@
 export type * from './rpc';
 
 // Re-export all response types
-export type * from './responses';
+export type * from './responses/node-responses';

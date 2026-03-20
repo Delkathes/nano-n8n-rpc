@@ -1,46 +1,163 @@
 # @nano/n8n-nodes-rpc-commands
 
-This is an n8n community node. It lets you use _app/service name_ in your n8n workflows.
+`@nano/n8n-nodes-rpc-commands` is an n8n community node package for interacting with a Nano node over RPC.
 
-_App/service name_ is _one or two sentences describing the service this node integrates with_.
+It includes:
 
-[n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/sustainable-use-license/) workflow automation platform.
-
-[Installation](#installation)
-[Operations](#operations)
-[Credentials](#credentials)
-[Compatibility](#compatibility)
-[Usage](#usage)
-[Resources](#resources)
-[Version history](#version-history)
+- **Nano RPC node** for on-demand actions (send, receive, account queries, wallet operations, work generation, admin/debug actions)
+- **Nano Trigger node** for event-driven workflows via webhook
 
 ## Installation
 
-Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
+Install this package as an n8n community node. See the official n8n guide:
 
-## Operations
+- [Install community nodes](https://docs.n8n.io/integrations/community-nodes/installation/)
 
-_List the operations supported by your node._
+Then add the following nodes in your workflow editor:
+
+- `Nano RPC`
+- `Nano Trigger`
 
 ## Credentials
 
-_If users need to authenticate with the app/service, provide details here. You should include prerequisites (such as signing up with the service), available authentication methods, and how to set them up._
+Credential type: **Nano API**
+
+### Required
+
+- **RPC URL**: URL of your Nano node RPC endpoint (for example `http://localhost:7076`)
+
+### Optional authentication
+
+- **None**
+- **Basic Auth** (`username`, `password`)
+- **API Key Header** (`headerName`, `apiKey`)
+
+### Optional defaults
+
+- **Wallet ID**: default wallet for wallet-dependent operations
+- **Default Source Account**: default source account for transfer operations
+
+## Supported operations
+
+Operations are grouped by resource.
+
+### Account
+
+- Get balance
+- Get account info
+- Get account history
+- Get account block count
+- Get account key / representative / weight
+- Validate address
+- Multi-account balance/frontier/receivable/representative queries
+
+### Transaction
+
+- Send payment
+- Receive pending transaction
+- Process block
+- Check receivable existence
+- Epoch upgrade
+
+### Block
+
+- Confirm block
+- Get block info / account / count
+- Get blocks / blocks info
+- Create block
+- Calculate block hash
+
+### Wallet
+
+- Create/destroy wallet
+- Create/list/remove/move accounts
+- Change/enter/validate wallet password
+- Wallet balances/history/info/ledger/frontiers/receivable/work
+- Set wallet/account representative
+- Set/get account work
+- Wallet add/watch/export/lock
+- Search receivable (single/all wallets)
+
+### Network
+
+- Node version/id/uptime/telemetry
+- Peers and online representatives
+- Keepalive, republish, populate backlog
+- Available supply
+
+### Ledger
+
+- Get chain/successors/frontiers/frontier count
+- Get ledger
+- Get unopened
+
+### Confirmation
+
+- Confirmation active/history/info/quorum
+- Election statistics
+
+### Work
+
+- Generate/validate work
+- Add/list/clear work peers
+- Cancel work
+
+### Keys
+
+- Create key pair
+- Expand key
+- Deterministic key derivation
+- Sign
+
+### Administration
+
+- Bootstrap/bootstrapAny/bootstrapLazy
+- Get/reset bootstrap state
+- Node stats (get/clear)
+- Unchecked blocks (get/clear)
+- Stop node
+
+### Conversion
+
+- Nano → raw (RPC)
+- raw → Nano (RPC)
+
+## Usage notes
+
+- Prefer a trusted/private Nano RPC endpoint for production usage.
+- Operations that mutate wallet or node state should only be enabled for trusted workflows/users.
+- Wallet IDs, block hashes, work values, and account addresses are validated before sensitive operations.
+- RPC calls include timeout and retry handling for transient network failures.
+
+### Runtime options
+
+Under **Options**, the node supports:
+
+- **Timeout (Ms)**: request timeout per RPC call
+- **Max Retries**: number of retries for transient failures (timeouts, rate limits, network/server errors)
 
 ## Compatibility
 
-_State the minimum n8n version, as well as which versions you test against. You can also include any known version incompatibility issues._
+- Package is built with the n8n community node tooling (`@n8n/node-cli`).
+- Peer dependency: `n8n-workflow@2.12.0`.
+- Use a Nano node version that supports the RPC actions you invoke.
 
-## Usage
+## Development
 
-_This is an optional section. Use it to help users with any difficult or confusing aspects of the node._
+Available scripts:
 
-_By the time users are looking for community nodes, they probably already know n8n basics. But if you expect new users, you can link to the [Try it out](https://docs.n8n.io/try-it-out/) documentation to help them get started._
+- `build`
+- `dev`
+- `lint`
+- `lint:fix`
+- `release`
 
 ## Resources
 
-* [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
-* _Link to app/service documentation._
+- [n8n community nodes docs](https://docs.n8n.io/integrations/#community-nodes)
+- [Nano RPC protocol docs](https://docs.nano.org/commands/rpc-protocol/)
+- [Nano RPC command index](https://docs.nano.org/commands/rpc-protocol/#rpc-commands)
 
 ## Version history
 
-_This is another optional section. If your node has multiple versions, include a short description of available versions and what changed, as well as any compatibility impact._
+See [CHANGELOG.md](./CHANGELOG.md).

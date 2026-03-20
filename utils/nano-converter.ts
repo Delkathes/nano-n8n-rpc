@@ -1,14 +1,13 @@
 import { parseDecimal, shiftedBy, toFixed } from './bigint';
 
-export type NanoUnit = 'RAW' | 'NANO' | 'MRAI' | 'KRAI' | 'RAI';
+type NanoUnit = 'RAW' | 'NANO' | 'MRAI' | 'KRAI' | 'RAI';
 
-export interface ConvertOptions {
+interface ConvertOptions {
 	/** Trim trailing zeros from the result (default: false) */
 	trim?: boolean;
 }
 
 export default class NanoConverter {
-
 	/**
 	 * Converts the input value to the wanted unit
 	 *
@@ -21,7 +20,7 @@ export default class NanoConverter {
 		input: string | number,
 		inputUnit: NanoUnit,
 		outputUnit: NanoUnit,
-		options: ConvertOptions = {}
+		options: ConvertOptions = {},
 	): string => {
 		if (input === undefined || input === null || input === '') {
 			return '0';
@@ -45,7 +44,9 @@ export default class NanoConverter {
 				value = shiftedBy(value, 24);
 				break;
 			default:
-				throw new Error(`Unknown input unit ${inputUnit}, expected one of the following: RAW, NANO, MRAI, KRAI, RAI`);
+				throw new Error(
+					`Unknown input unit ${inputUnit}, expected one of the following: RAW, NANO, MRAI, KRAI, RAI`,
+				);
 		}
 
 		// Convert RAW to output unit
@@ -60,8 +61,9 @@ export default class NanoConverter {
 			case 'RAI':
 				return toFixed(shiftedBy(value, -24), 24, trim);
 			default:
-				throw new Error(`Unknown output unit ${outputUnit}, expected one of the following: RAW, NANO, MRAI, KRAI, RAI`);
+				throw new Error(
+					`Unknown output unit ${outputUnit}, expected one of the following: RAW, NANO, MRAI, KRAI, RAI`,
+				);
 		}
-	}
-
+	};
 }

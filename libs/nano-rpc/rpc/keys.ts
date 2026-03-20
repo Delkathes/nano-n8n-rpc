@@ -1,37 +1,47 @@
 import type { IExecuteFunctions } from 'n8n-workflow';
 import { nanoRPCCall } from './core';
 import type {
-  INanoRPCConfig,
-  KeyPairResponse,
-  SignOptions,
-  SignRPCResponse,
-  DeterministicKeyRPCResponse,
+	INanoRPCConfig,
+	KeyPairResponse,
+	SignOptions,
+	SignRPCResponse,
+	DeterministicKeyRPCResponse,
 } from '../../../types/rpc';
 
 /**
  * Derive deterministic keypair from seed based on index
  */
 export async function getDeterministicKey(
-  context: IExecuteFunctions,
-  config: INanoRPCConfig,
-  seed: string,
-  index: number
+	context: IExecuteFunctions,
+	config: INanoRPCConfig,
+	seed: string,
+	index: number,
 ): Promise<DeterministicKeyRPCResponse> {
-  return await nanoRPCCall<DeterministicKeyRPCResponse>(context, config, 'deterministic_key', { seed, index });
+	return await nanoRPCCall<DeterministicKeyRPCResponse>(context, config, 'deterministic_key', {
+		seed,
+		index,
+	});
 }
 
 /**
  * Generate a new random keypair
  */
-export async function createKey(context: IExecuteFunctions, config: INanoRPCConfig): Promise<KeyPairResponse> {
-  return await nanoRPCCall<KeyPairResponse>(context, config, 'key_create');
+export async function createKey(
+	context: IExecuteFunctions,
+	config: INanoRPCConfig,
+): Promise<KeyPairResponse> {
+	return await nanoRPCCall<KeyPairResponse>(context, config, 'key_create');
 }
 
 /**
  * Expand a private key to get public key and account
  */
-export async function expandKey(context: IExecuteFunctions, config: INanoRPCConfig, key: string): Promise<KeyPairResponse> {
-  return await nanoRPCCall<KeyPairResponse>(context, config, 'key_expand', { key });
+export async function expandKey(
+	context: IExecuteFunctions,
+	config: INanoRPCConfig,
+	key: string,
+): Promise<KeyPairResponse> {
+	return await nanoRPCCall<KeyPairResponse>(context, config, 'key_expand', { key });
 }
 
 /**
@@ -39,12 +49,12 @@ export async function expandKey(context: IExecuteFunctions, config: INanoRPCConf
  * @deprecated Use signBlock for more options
  */
 export async function sign(
-  context: IExecuteFunctions,
-  config: INanoRPCConfig,
-  key: string,
-  hash: string
+	context: IExecuteFunctions,
+	config: INanoRPCConfig,
+	key: string,
+	hash: string,
 ): Promise<SignRPCResponse> {
-  return await nanoRPCCall<SignRPCResponse>(context, config, 'sign', { key, hash });
+	return await nanoRPCCall<SignRPCResponse>(context, config, 'sign', { key, hash });
 }
 
 /**
@@ -53,28 +63,28 @@ export async function sign(
  * When signing a block, returns the block with updated signature
  */
 export async function signBlock(
-  context: IExecuteFunctions,
-  config: INanoRPCConfig,
-  options: SignOptions
+	context: IExecuteFunctions,
+	config: INanoRPCConfig,
+	options: SignOptions,
 ): Promise<SignRPCResponse> {
-  const params: Record<string, unknown> = {};
+	const params: Record<string, unknown> = {};
 
-  // Set signing credentials - either key or wallet+account
-  if (options.key) {
-    params.key = options.key;
-  } else if (options.wallet && options.account) {
-    params.wallet = options.wallet;
-    params.account = options.account;
-  }
+	// Set signing credentials - either key or wallet+account
+	if (options.key) {
+		params.key = options.key;
+	} else if (options.wallet && options.account) {
+		params.wallet = options.wallet;
+		params.account = options.account;
+	}
 
-  // Set what to sign - either block or hash
-  if (options.block) {
-    params.json_block = true;
-    params.block = options.block;
-  } else if (options.hash) {
-    params.hash = options.hash;
-  }
+	// Set what to sign - either block or hash
+	if (options.block) {
+		params.json_block = true;
+		params.block = options.block;
+	} else if (options.hash) {
+		params.hash = options.hash;
+	}
 
-  const response = await nanoRPCCall<SignRPCResponse>(context, config, 'sign', params);
-  return response;
+	const response = await nanoRPCCall<SignRPCResponse>(context, config, 'sign', params);
+	return response;
 }

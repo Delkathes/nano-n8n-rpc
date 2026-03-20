@@ -4,19 +4,19 @@ import {
 	type IWebhookResponseData,
 	type INodeType,
 	type INodeTypeDescription,
-    type IDataObject,
+	type IDataObject,
+	NodeOperationError,
+	NodeConnectionTypes,
 } from 'n8n-workflow';
 
 import { rawToNano } from '../../utils/conversions';
 
 import type { BlockContents } from '../../types';
 
-import { NanoTriggerDescription } from './NanoTrigger.description';
-
 /**
  * Filter options for Nano confirmations
  */
-export interface NanoFilterOptions {
+interface NanoFilterOptions {
 	accounts?: string;
 	subtypes?: string[];
 	minAmount?: number;
@@ -26,7 +26,7 @@ export interface NanoFilterOptions {
 /**
  * Advanced options for Nano trigger
  */
-export interface NanoAdvancedOptions {
+interface NanoAdvancedOptions {
 	includeBlock?: boolean;
 	validateSignature?: boolean;
 	enrichAccountInfo?: boolean;
@@ -34,7 +34,141 @@ export interface NanoAdvancedOptions {
 }
 
 export class NanoTrigger implements INodeType {
-	description: INodeTypeDescription = NanoTriggerDescription;
+	description: INodeTypeDescription = {
+		displayName: 'Nano Trigger',
+		name: 'nanoTrigger',
+		icon: 'file:nano.svg',
+		group: ['trigger'],
+		version: 1,
+		description: 'Receive Nano block confirmations via HTTP callback',
+		defaults: {
+			name: 'Nano Trigger',
+		},
+		inputs: [],
+		outputs: [NodeConnectionTypes.Main],
+		usableAsTool: undefined,
+		credentials: [
+			{
+				name: 'nanoApi',
+				required: true,
+			},
+		],
+		webhooks: [
+			{
+				name: 'default',
+				httpMethod: 'POST',
+				responseMode: 'onReceived',
+				path: 'webhook',
+			},
+		],
+		properties: [
+			{
+				displayName: 'Configuration Info',
+				name: 'configNotice',
+				type: 'notice',
+				default:
+					'Configure your Nano node to send HTTP callbacks to the webhook URL shown above. Only block confirmation events are supported via HTTP callbacks.',
+			},
+			{
+				displayName: 'Filter Options',
+				name: 'filterOptions',
+				type: 'collection',
+				placeholder: 'Add Filter',
+				default: {},
+				options: [
+					{
+						displayName: 'Accounts',
+						name: 'accounts',
+						type: 'string',
+						default: '',
+						placeholder: 'nano_1abc...,nano_2def...',
+						description:
+							'Comma-separated list of accounts to filter events for. Only events matching these accounts will trigger the workflow.',
+					},
+					{
+						displayName: 'Block Subtypes',
+						name: 'subtypes',
+						type: 'multiOptions',
+						default: [],
+						options: [
+							{ name: 'Send', value: 'send', description: 'Sending transactions' },
+							{ name: 'Receive', value: 'receive', description: 'Receiving transactions' },
+							{
+								name: 'Change',
+								value: 'change',
+								description: 'Representative change blocks',
+							},
+							{ name: 'Epoch', value: 'epoch', description: 'Epoch upgrade blocks' },
+						],
+						description: 'Filter by block subtypes. Leave empty to receive all subtypes.',
+					},
+					{
+						displayName: 'Minimum Amount (Nano)',
+						name: 'minAmount',
+						type: 'number',
+						default: 0,
+						description:
+							'Only trigger for confirmations with at least this amount in Nano. Set to 0 to disable.',
+						typeOptions: {
+							minValue: 0,
+							numberPrecision: 30,
+						},
+					},
+					{
+						displayName: 'Maximum Amount (Nano)',
+						name: 'maxAmount',
+						type: 'number',
+						default: 0,
+						description:
+							'Only trigger for confirmations with at most this amount in Nano. Set to 0 to disable.',
+						typeOptions: {
+							minValue: 0,
+							numberPrecision: 30,
+						},
+					},
+				],
+			},
+			{
+				displayName: 'Advanced Options',
+				name: 'advancedOptions',
+				type: 'collection',
+				placeholder: 'Add Option',
+				default: {},
+				options: [
+					{
+						displayName: 'Include Block Contents',
+						name: 'includeBlock',
+						type: 'boolean',
+						default: true,
+						description: 'Whether to include full block contents in the response',
+					},
+					{
+						displayName: 'Validate Block Signature',
+						name: 'validateSignature',
+						type: 'boolean',
+						default: false,
+						description:
+							'Whether to validate block signature (extra RPC call + requires credentials)',
+					},
+					{
+						displayName: 'Enrich With Account Info',
+						name: 'enrichAccountInfo',
+						type: 'boolean',
+						default: false,
+						description:
+							'Whether to fetch additional account information (balance, representative) via RPC',
+					},
+					{
+						displayName: 'Deduplicate By Hash',
+						name: 'deduplicateHash',
+						type: 'boolean',
+						default: true,
+						description: 'Whether to prevent duplicate triggers for the same block hash',
+					},
+				],
+			},
+		],
+	};
 
 	// Deduplication constants
 	private static readonly MAX_HASH_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -55,7 +189,7 @@ export class NanoTrigger implements INodeType {
 				return true;
 			},
 		},
-    };
+	};
 
 	async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
 		// Get node parameters
@@ -68,16 +202,20 @@ export class NanoTrigger implements INodeType {
 
 		// Parse incoming request data
 		const bodyData = parseRequestBody(this);
-		let parsedBlock: BlockContents
+		let parsedBlock: BlockContents;
 
 		try {
-			parsedBlock  = JSON.parse(bodyData.block);
+			parsedBlock = JSON.parse(bodyData.block);
 		} catch (error) {
-			throw new Error(`Failed to parse block data from webhook payload, ${error.message}`);
+			const message = error instanceof Error ? error.message : String(error);
+			throw new NodeOperationError(
+				this.getNode(),
+				`Failed to parse block data from webhook payload: ${message}`,
+			);
 		}
 
 		// Convert amount to Nano
-        const amountNano = Number(rawToNano(bodyData.amount));
+		const amountNano = Number(rawToNano(bodyData.amount));
 
 		// Get workflow-scoped static data for deduplication
 		let seenHashes: Record<string, number> = {};
@@ -123,12 +261,10 @@ export class NanoTrigger implements INodeType {
 	}
 }
 
-
-
 /**
  * Raw HTTP callback payload from Nano node
  */
-export interface NanoCallbackPayload {
+interface NanoCallbackPayload {
 	account: string;
 	hash: string;
 	block: string;
@@ -139,7 +275,7 @@ export interface NanoCallbackPayload {
 /**
  * Account info response from RPC
  */
-export interface NanoAccountInfo {
+interface NanoAccountInfo {
 	balance: bigint;
 	balanceRaw: string;
 	representative: string;
@@ -151,44 +287,43 @@ export interface NanoAccountInfo {
 /**
  * Webhook response data
  */
-export interface NanoWebhookData  extends IDataObject {
+interface NanoWebhookData extends IDataObject {
 	topic: string;
-    receivedAt: string;
+	receivedAt: string;
 
 	account: string;
 	hash: string;
-    subtype: string;
+	subtype: string;
 
 	amountRaw: string;
-    amountNano: number;
+	amountNano: number;
 
 	block?: BlockContents;
 	signatureValid?: boolean;
 	accountInfo?: NanoAccountInfo | null;
 }
 
-
 /**
  * Parses the request body data
  */
 function parseRequestBody(context: IWebhookFunctions): NanoCallbackPayload {
-	let bodyData: any;
+	let bodyData;
 
 	try {
 		bodyData = context.getBodyData();
-	} catch (error) {
+	} catch {
 		bodyData = {};
 	}
 
 	// Fallback to raw body if needed
 	if (!bodyData || Object.keys(bodyData).length === 0) {
 		const req = context.getRequestObject();
-		const rawBody = (req as any).rawBody || (req as any).body;
+		const rawBody = req.rawBody || req.body;
 
 		if (typeof rawBody === 'string') {
 			try {
 				bodyData = JSON.parse(rawBody);
-			} catch (e) {
+			} catch {
 				// Failed to parse
 			}
 		} else if (rawBody) {
@@ -202,17 +337,15 @@ function parseRequestBody(context: IWebhookFunctions): NanoCallbackPayload {
 /**
  * Validates block signature via RPC call
  */
-async function validateBlockSignature(
-	context: IWebhookFunctions,
-	hash: string,
-): Promise<boolean> {
+async function validateBlockSignature(context: IWebhookFunctions, hash: string): Promise<boolean> {
 	try {
 		const credentials = await context.getCredentials('nanoApi');
 		const rpcUrl = credentials.rpcUrl as string;
 
-		const httpRequestWithAuthentication = context.helpers.httpRequestWithAuthentication.bind(context);
+		const httpRequestWithAuthentication =
+			context.helpers.httpRequestWithAuthentication.bind(context);
 
-		const validationResult = await httpRequestWithAuthentication('nanoApi',{
+		const validationResult = await httpRequestWithAuthentication('nanoApi', {
 			method: 'POST',
 			url: rpcUrl,
 			body: {
@@ -224,7 +357,7 @@ async function validateBlockSignature(
 		});
 
 		return !!validationResult;
-	} catch (e) {
+	} catch {
 		return false;
 	}
 }
@@ -240,7 +373,8 @@ async function fetchAccountInfo(
 		const credentials = await context.getCredentials('nanoApi');
 		const rpcUrl = credentials.rpcUrl as string;
 
-		const httpRequestWithAuthentication = context.helpers.httpRequestWithAuthentication.bind(context);
+		const httpRequestWithAuthentication =
+			context.helpers.httpRequestWithAuthentication.bind(context);
 
 		const accountInfo = await httpRequestWithAuthentication('nanoApi', {
 			method: 'POST',
@@ -253,7 +387,7 @@ async function fetchAccountInfo(
 				pending: true,
 			},
 			json: true,
-        });
+		});
 
 		return {
 			balance: BigInt(rawToNano(accountInfo.balance)),
@@ -263,12 +397,11 @@ async function fetchAccountInfo(
 			weight: accountInfo.weight,
 			pending: accountInfo.pending,
 		};
-	} catch (e) {
+	} catch {
 		// Account might not exist yet
 		return null;
 	}
 }
-
 
 function buildWebhookResponse(
 	bodyData: NanoCallbackPayload,
@@ -278,32 +411,27 @@ function buildWebhookResponse(
 ): NanoWebhookData {
 	const webhookData: NanoWebhookData = {
 		topic: 'confirmation',
-        receivedAt: new Date().toISOString(),
-        account: bodyData.account,
-        hash: bodyData.hash,
-        subtype: bodyData.subtype,
-        amountRaw: bodyData.amount,
-        amountNano: amountNano,
+		receivedAt: new Date().toISOString(),
+		account: bodyData.account,
+		hash: bodyData.hash,
+		subtype: bodyData.subtype,
+		amountRaw: bodyData.amount,
+		amountNano: amountNano,
 	};
 
 	// Block data (all other block fields are inside this object)
 	if (parsedBlock && includeBlock) {
-        webhookData.block = parsedBlock;
-    }
+		webhookData.block = parsedBlock;
+	}
 
 	return webhookData;
 }
-
-
 
 /**
  * Validates if a block hash has been seen before (deduplication)
  * Uses a Record with timestamps for automatic cleanup of old entries
  */
-export function isDuplicateHash(
-	hash: string,
-	seenHashes: Record<string, number>,
-): boolean {
+export function isDuplicateHash(hash: string, seenHashes: Record<string, number>): boolean {
 	if (seenHashes[hash]) {
 		return true;
 	}
