@@ -80,4 +80,17 @@ export const debugNanoRPCParameterProperties: INodeProperties[] = [
 		placeholder: 'Starting key (optional)',
 		description: 'Starting key for unchecked query (optional)',
 	},
+	{
+		displayName: 'Confirm Stop Node',
+		name: 'stopNodeConfirmed',
+		type: 'boolean',
+		displayOptions: {
+			show: {
+				operation: ['stopNode'],
+			},
+		},
+		default: false,
+		description:
+			'Set to true to confirm this will immediately shut down the configured Nano node. This action cannot be undone.',
+	},
 ];

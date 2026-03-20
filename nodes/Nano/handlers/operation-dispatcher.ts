@@ -2061,6 +2061,15 @@ export async function dispatchNanoOperation(params: {
 			}
 
 			case 'stopNode': {
+				const confirmed = this.getNodeParameter('stopNodeConfirmed', i, false) as boolean;
+				if (!confirmed) {
+					throw new NodeOperationError(
+						this.getNode(),
+						'stopNode requires confirmation. Set "Confirm Stop Node" to true to proceed.',
+						{ itemIndex: i },
+					);
+				}
+
 				const { success } = await rpc.stopNode();
 
 				responseData = {
