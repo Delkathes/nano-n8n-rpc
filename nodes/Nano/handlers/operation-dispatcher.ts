@@ -2226,7 +2226,7 @@ export async function dispatchNanoOperation(params: {
 
 				responseData = {
 					hash,
-					block: blockParams,
+					block: blockParams as rpcTypes.BlockContents,
 				};
 				break;
 			}
