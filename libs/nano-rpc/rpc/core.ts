@@ -3,7 +3,6 @@ import type { INanoRPCConfig, INanoRPCResponse } from '../../../types/rpc';
 
 const DEFAULT_TIMEOUT_MS = 15_000;
 const DEFAULT_MAX_RETRIES = 2;
-const DEFAULT_RETRY_DELAY_MS = 300;
 
 function shouldRetry(error: unknown): boolean {
 	if (!error || typeof error !== 'object') return false;

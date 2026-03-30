@@ -91,6 +91,6 @@ export const debugNanoRPCParameterProperties: INodeProperties[] = [
 		},
 		default: false,
 		description:
-			'Set to true to confirm this will immediately shut down the configured Nano node. This action cannot be undone.',
+			'Whether to confirm this will immediately shut down the configured Nano node. This action cannot be undone.',
 	},
 ];
