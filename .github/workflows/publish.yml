@@ -75,14 +75,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          node-version: '22'
           cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
-        run: 'pnpm install --approve-builds'
+        run: pnpm install --frozen-lockfile
 
       - name: Release
         # Publishes to npm with a provenance attestation (requires id-token: write above).
