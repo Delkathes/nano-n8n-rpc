@@ -1,5 +1,5 @@
 {
-	"name": "n8n-nano-rpc",
+	"name": "n8n-nodes-nano-rpc",
 	"version": "0.1.0",
 	"description": "n8n community node package to execute Nano node RPC commands",
 	"license": "MIT",
