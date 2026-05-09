@@ -1,6 +1,6 @@
-# @nano/n8n-rpc
+# n8n-nano-rpc
 
-`@nano/n8n-rpc` is an n8n community node package for interacting with a Nano node over RPC.
+`n8n-nano-rpc` is an n8n community node package for interacting with a Nano node over RPC.
 
 It includes:
 
