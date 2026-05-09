@@ -3,7 +3,7 @@
 	"version": "0.1.0",
 	"description": "n8n community node package to execute Nano node RPC commands",
 	"license": "MIT",
-	"homepage": "https://github.com/Delkathes/n8n-nano-rpc",
+	"homepage": "https://github.com/Delkathes/nano-n8n-rpc",
 	"keywords": [
 		"n8n-community-node-package",
 		"n8n",
@@ -17,7 +17,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Delkathes/n8n-nano-rpc.git"
+		"url": "https://github.com/Delkathes/nano-n8n-rpc.git"
 	},
 	"scripts": {
 		"build": "n8n-node build",
@@ -43,13 +43,22 @@
 		]
 	},
 	"devDependencies": {
-		"@n8n/node-cli": "0.23.1",
+		"@n8n/node-cli": "0.29.1",
+		"@release-it-plugins/lerna-changelog": "^8.0.1",
+		"@release-it/conventional-changelog": "^11.0.0",
 		"eslint": "9.39.4",
-		"prettier": "3.8.1",
+		"prettier": "3.8.3",
 		"release-it": "19.2.4",
 		"typescript": "5.9.3"
 	},
 	"peerDependencies": {
-		"n8n-workflow": "^2.13.1"
+		"n8n-workflow": "^2.16.0"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"eslint-plugin-n8n-nodes-base",
+			"isolated-vm",
+			"unrs-resolver"
+		]
 	}
 }

@@ -42,6 +42,7 @@ export class NanoTrigger implements INodeType {
 		icon: 'file:nano.svg',
 		group: ['trigger'],
 		version: 1,
+		subtitle: 'Webhook trigger',
 		description: 'Receive Nano block confirmations via HTTP callback',
 		defaults: {
 			name: 'Nano Trigger',

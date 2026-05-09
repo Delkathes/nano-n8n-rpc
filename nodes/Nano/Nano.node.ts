@@ -5,6 +5,7 @@ import {
 	type INodeTypeDescription,
 	type IDataObject,
 	NodeConnectionTypes,
+	NodeOperationError,
 } from 'n8n-workflow';
 
 import { createNanoRPC } from '../../libs/nano-rpc/nano-rpc';
@@ -199,7 +200,7 @@ export class Nano implements INodeType {
 					});
 					continue;
 				}
-				throw error;
+				throw new NodeOperationError(this.getNode(), error as Error);
 			}
 		}
 

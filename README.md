@@ -1,6 +1,6 @@
-# @nano/n8n-nodes-rpc-commands
+# @nano/n8n-rpc
 
-`@nano/n8n-nodes-rpc-commands` is an n8n community node package for interacting with a Nano node over RPC.
+`@nano/n8n-rpc` is an n8n community node package for interacting with a Nano node over RPC.
 
 It includes:
 
